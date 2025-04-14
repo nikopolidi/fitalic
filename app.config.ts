@@ -62,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     '@bacons/apple-targets',
     // './plugins/withAppGroupEntitlements',
-    // './plugins/withWidgetModule/index.js'
+    // './plugins/withWidgetModule/index.js',
   ],
   experiments: {
     typedRoutes: true

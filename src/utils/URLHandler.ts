@@ -1,6 +1,5 @@
 import { Linking } from 'react-native';
 import { router } from 'expo-router';
-import WidgetManager from './WidgetManager';
 
 export const initializeURLHandler = () => {
   // Обработка URL при запуске приложения

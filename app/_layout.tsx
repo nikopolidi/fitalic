@@ -1,14 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, Slot } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from 'react-native';
 
 import { initializeURLHandler } from '../src/utils/URLHandler';
-import WidgetManager from '../src/utils/WidgetManager';
+import { setTargetNutrition, setConsumedNutrition } from '../src/utils/WidgetManager';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -35,19 +34,18 @@ export default function RootLayout() {
       initializeURLHandler();
       try {
         // Инициализируем виджет с дефолтными значениями
-        await WidgetManager.updateWidget({
-          sections: [
-            { id: '1', title: 'Тренировка', color: '#FF3B30' },
-            { id: '2', title: 'Статистика', color: '#34C759' },
-          ],
-          style: {
-            backgroundColor: '#000000',
-            dividerColor: '#FFFFFF',
-            dividerWidth: 1,
-            fontSize: 16,
-            fontWeight: 600,
-            padding: 12,
-          },
+        await setTargetNutrition({
+          calories: 2000,
+          protein: 150,
+          carbs: 200,
+          fat: 50
+        });
+
+        await setConsumedNutrition({
+          calories: 500,
+          protein: 30,
+          carbs: 50,
+          fat: 15
         });
       } catch (error) {
         console.error('Error initializing widget:', error);
@@ -79,18 +77,16 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen 
-          name="section/[id]" 
-          options={{ 
-            title: 'Секция',
-            headerShown: true,
-          }} 
-        />
-      </Stack>
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+      <Stack.Screen 
+        name="section/[id]" 
+        options={{ 
+          title: 'Секция',
+          headerShown: true,
+        }} 
+      />
+    </Stack>
   );
 }

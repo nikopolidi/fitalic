@@ -11,17 +11,9 @@ struct NutritionData: Codable, Equatable {
   static let zero = NutritionData(calories: 0, protein: 0, carbs: 0, fat: 0)
 }
 
-// Structure for decoding data saved in the app
-struct SharedData: Codable {
-  let consumed: NutritionData
-  let target: NutritionData?
-  let lastUpdated: String
-}
-
 // Model for widget data
 struct WidgetData: TimelineEntry {
   let date: Date
-  let widgetState: String
   let consumed: NutritionData
   let target: NutritionData?
 }
@@ -29,7 +21,8 @@ struct WidgetData: TimelineEntry {
 // App constants
 struct AppConstants {
   static let appGroupIdentifier = "group.com.vitalii.nikopolidi.fitalic.shared"
-  static let widgetDataKey = "fitalic_widget_data"
+  static let targetNutritionKey = "targetNutrition"
+  static let consumedNutritionKey = "consumedNutrition"
 }
 
 // Provider for updating the widget
@@ -37,7 +30,6 @@ struct Provider: TimelineProvider {
   func placeholder(in context: Context) -> WidgetData {
     WidgetData(
       date: Date(),
-      widgetState: "Placeholder",
       consumed: NutritionData(calories: 3500, protein: 100, carbs: 100, fat: 50),
       target: NutritionData(calories: 2000, protein: 200, carbs: 200, fat: 50)
     )
@@ -49,45 +41,45 @@ struct Provider: TimelineProvider {
   }
   
   func getTimeline(in context: Context, completion: @escaping (Timeline<WidgetData>) -> Void) {
-    // Get widget data
     let entry = getWidgetData()
-    
-    // Update widget every hour
-    let nextUpdateDate = Calendar.current.date(byAdding: .hour, value: 1, to: Date()) ?? Date()
-    
-    // Generate timeline for widget updates
+    let nextUpdateDate = Calendar.current.date(byAdding: .minute, value: 15, to: Date()) ?? Date()
     let timeline = Timeline(entries: [entry], policy: .after(nextUpdateDate))
     completion(timeline)
   }
   
   // Get data from UserDefaults in App Group
   private func getWidgetData() -> WidgetData {
-    if let sharedDefaults = UserDefaults(suiteName: AppConstants.appGroupIdentifier) {
-      if let savedData = sharedDefaults.string(forKey: AppConstants.widgetDataKey),
-         let data = savedData.data(using: .utf8) {
-        do {
-          let decoder = JSONDecoder()
-          let sharedData = try decoder.decode(SharedData.self, from: data)
-          
-          return WidgetData(
-            date: Date(),
-            widgetState: "Live",
-            consumed: sharedData.consumed,
-            target: sharedData.target
-          )
-        } catch {
-          print("Error decoding widget data: \(error)")
-        }
-      }
+    guard let sharedDefaults = UserDefaults(suiteName: AppConstants.appGroupIdentifier) else {
+      return WidgetData(
+        date: Date(),
+        consumed: NutritionData.zero,
+        target: nil
+      )
     }
     
-    // Return default data if saved data couldn't be retrieved
+    let consumed = getNutritionData(from: sharedDefaults, key: AppConstants.consumedNutritionKey) ?? NutritionData.zero
+    let target = getNutritionData(from: sharedDefaults, key: AppConstants.targetNutritionKey)
+    
     return WidgetData(
       date: Date(),
-      widgetState: "No Data",
-      consumed: NutritionData.zero,
-      target: nil
+      consumed: consumed,
+      target: target
     )
+  }
+  
+  private func getNutritionData(from defaults: UserDefaults, key: String) -> NutritionData? {
+    guard let data = defaults.string(forKey: key),
+          let jsonData = data.data(using: .utf8) else {
+      return nil
+    }
+    
+    do {
+      let decoder = JSONDecoder()
+      return try decoder.decode(NutritionData.self, from: jsonData)
+    } catch {
+      print("Error decoding \(key): \(error)")
+      return nil
+    }
   }
 }
 
@@ -97,7 +89,6 @@ struct WidgetEntryView: View {
   @Environment(\.widgetFamily) var family
   
   var body: some View {
-    // Widget content
     if #available(iOSApplicationExtension 17.0, *) {
       contentView
         .containerBackground(.black, for: .widget)
@@ -111,126 +102,78 @@ struct WidgetEntryView: View {
   
   // Content of the widget
   private var contentView: some View {
-    VStack(spacing: 0) {
-      // Header
-      HStack {
-        Text("Consumption")
-          .font(.system(size: 13, weight: .bold))
-          .foregroundColor(.white)
-        
-        Spacer()
-      }
-      Spacer()
-        .frame(height: 5)
-      // Calories
-      HStack {
-        if let target = entry.target {
-          Text("\(entry.consumed.calories)/\(target.calories)")
-            .font(.system(size: 16, weight: .bold))
-            .foregroundColor(.white)
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-        } else {
-          Text("\(entry.consumed.calories)")
-            .font(.system(size: 16, weight: .bold))
-            .foregroundColor(.white)
-        }
-        
-        Spacer()
-      }
+    ZStack {
+      Color.black.edgesIgnoringSafeArea(.all)
       
-      Spacer()
-        .frame(height: 0)
-      
-      // Macronutrients
-      HStack(spacing: 10) {
-        // Protein
-        VStack(alignment: .leading, spacing: 0) {
-          Text("Prot")
-            .font(.system(size: 10))
-            .foregroundColor(.white.opacity(0.7))
-            .lineLimit(1)
-          if let target = entry.target {
-            Text("\(entry.consumed.protein)/\(target.protein)")
-              .font(.system(size: 11))
-              .foregroundColor(.white)
-              .lineLimit(1)
-              .minimumScaleFactor(0.8)
-          } else {
-            Text("\(entry.consumed.protein)")
-              .font(.system(size: 11))
-              .foregroundColor(.white)
-              .lineLimit(1)
-          }
-        }
-        .frame(maxWidth: .infinity)
-        
-        // Carbs
-        VStack(alignment: .center, spacing: 0) {
-          Text("Carbs")
-            .font(.system(size: 10))
-            .foregroundColor(.white.opacity(0.7))
-            .lineLimit(1)
-          if let target = entry.target {
-            Text("\(entry.consumed.carbs)/\(target.carbs)")
-              .font(.system(size: 11))
-              .foregroundColor(.white)
-              .lineLimit(1)
-              .minimumScaleFactor(0.8)
-          } else {
-            Text("\(entry.consumed.carbs)")
-              .font(.system(size: 11))
-              .foregroundColor(.white)
-              .lineLimit(1)
-          }
-        }
-        .frame(maxWidth: .infinity)
-        
-        // Fat
-        VStack(alignment: .trailing, spacing: 0) {
-          Text("Fat")
-            .font(.system(size: 10))
-            .foregroundColor(.white.opacity(0.7))
-            .lineLimit(1)
+      VStack(spacing: 2) {
+        // Top row with calories and fat
+        HStack(spacing: 30) {
+          // Calories progress
+          CircularProgressView(
+            progress: calculateProgress(current: entry.consumed.calories, target: entry.target?.calories),
+            image: "calories",
+            value: entry.consumed.calories,
+            maxValue: entry.target?.calories
+          )
           
-          if let target = entry.target {
-            Text("\(entry.consumed.fat)/\(target.fat)")
-              .font(.system(size: 11))
-              .foregroundColor(.white)
-              .lineLimit(1)
-              .minimumScaleFactor(0.8)
-          } else {
-            Text("\(entry.consumed.fat)")
-              .font(.system(size: 11))
-              .foregroundColor(.white)
-              .lineLimit(1)
-          }
-        }
-        .frame(maxWidth: .infinity)
-      }
-      
-      Spacer()
-      
-      // Action buttons
-      HStack {
-        // Voice input
-        Link(destination: URL(string: "fitalic://voice-input")!) {
-          Image(systemName: "mic")
-            .font(.system(size: 17))
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity, maxHeight: 30)
+          // Fat progress
+          CircularProgressView(
+            progress: calculateProgress(current: entry.consumed.fat, target: entry.target?.fat),
+            image: "fat",
+            value: entry.consumed.fat,
+            maxValue: entry.target?.fat
+          )
         }
         
-        // Text input
-        Link(destination: URL(string: "fitalic://text-input")!) {
-          Image(systemName: "keyboard")
-            .font(.system(size: 17))
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity, maxHeight: 30)
+        // Bottom row with protein and carbs
+        HStack(spacing: 30) {
+          // Protein progress
+          CircularProgressView(
+            progress: calculateProgress(current: entry.consumed.protein, target: entry.target?.protein),
+            image: "protein",
+            value: entry.consumed.protein,
+            maxValue: entry.target?.protein
+          )
+          
+          // Carbs progress
+          CircularProgressView(
+            progress: calculateProgress(current: entry.consumed.carbs, target: entry.target?.carbs),
+            image: "carbs",
+            value: entry.consumed.carbs,
+            maxValue: entry.target?.carbs
+          )
         }
+        
+        // Bottom row with microphone and keyboard
+        HStack(spacing: 60) {
+          // Voice input
+          Link(destination: URL(string: "fitalic://voice-input")!) {
+            Image(systemName: "mic")
+              .font(.system(size: 20))
+              .foregroundColor(.white)
+          }
+          
+          // Text input
+          Link(destination: URL(string: "fitalic://text-input")!) {
+            Image(systemName: "keyboard")
+              .font(.system(size: 20))
+              .foregroundColor(.white)
+          }
+        }
+        .padding(.top, 10)
       }
+      .padding(15)
     }
-    .padding(10)
+  }
+  
+  // Calculate progress percentage (0.0 to 1.0)
+  private func calculateProgress(current: Int, target: Int?) -> CGFloat {
+    guard let target = target, target > 0 else {
+      return 0.0
+    }
+    
+    let progress = min(CGFloat(current) / CGFloat(target), 1.0)
+    return progress
   }
 }
 
@@ -243,16 +186,64 @@ struct FitalicWidget: Widget {
       WidgetEntryView(entry: entry)
     }
     .configurationDisplayName("Fitalic")
-    .description("Отслеживай потребление калорий и макронутриентов")
+    .description("Tracking calories and macronutrients")
     .supportedFamilies([.systemSmall, .systemMedium])
   }
 }
 
-// Main entry point
-@main
-struct MainWidget: WidgetBundle {
-  var body: some Widget {
-    FitalicWidget()
+// Circular Progress View
+struct CircularProgressView: View {
+  let progress: CGFloat
+  let image: String
+  let value: Int?
+  let maxValue: Int?
+  
+  var body: some View {
+    ZStack {
+      // Background circle
+      Circle()
+        .stroke(lineWidth: 6)
+        .opacity(0.3)
+        .foregroundColor(Color.gray)
+      
+      // Progress circle
+      Circle()
+        .trim(from: 0.0, to: progress)
+        .stroke(style: StrokeStyle(lineWidth: 6, lineCap: .round))
+        .foregroundColor(Color.pink)
+        .rotationEffect(Angle(degrees: 270.0))
+      
+      // Center content
+      VStack(spacing: 2) {
+        // Image
+        Image(image)
+          .renderingMode(.template)
+          .resizable()
+          .scaledToFit()
+          .frame(width: 25, height: 25)
+          .foregroundColor(.white)
+        
+        // Value display
+        VStack(spacing: 0) {
+          // Show the current value, or 0 if nil
+          Text("\(value ?? 0)")
+            .font(.system(size: 12, weight: .bold))
+            .foregroundColor(.white)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+          
+          // Conditionally show maxValue if it's not nil
+          if let maxVal = maxValue {
+            Text("\(maxVal)")
+              .font(.system(size: 12, weight: .bold))
+              .foregroundColor(.white)
+              .lineLimit(1)
+              .minimumScaleFactor(0.7)
+          }
+        }
+      }
+    }
+    .frame(width: 60, height: 60)
   }
 }
 
@@ -263,8 +254,7 @@ struct WidgetPreviews: PreviewProvider {
       // With goals
       WidgetEntryView(entry: WidgetData(
         date: Date(),
-        widgetState: "Preview",
-        consumed: NutritionData(calories: 3500, protein: 100, carbs: 100, fat: 50),
+        consumed: NutritionData(calories: 250, protein: 100, carbs: 100, fat: 50),
         target: NutritionData(calories: 2000, protein: 200, carbs: 200, fat: 50)
       ))
       .previewContext(WidgetPreviewContext(family: .systemSmall))
@@ -273,7 +263,6 @@ struct WidgetPreviews: PreviewProvider {
       // Without goals
       WidgetEntryView(entry: WidgetData(
         date: Date(),
-        widgetState: "Preview",
         consumed: NutritionData(calories: 350, protein: 100, carbs: 100, fat: 50),
         target: nil
       ))
@@ -283,7 +272,6 @@ struct WidgetPreviews: PreviewProvider {
       // No data
       WidgetEntryView(entry: WidgetData(
         date: Date(),
-        widgetState: "No Data",
         consumed: NutritionData.zero,
         target: nil
       ))
@@ -293,7 +281,6 @@ struct WidgetPreviews: PreviewProvider {
       // Medium widget with goals
       WidgetEntryView(entry: WidgetData(
         date: Date(),
-        widgetState: "Preview",
         consumed: NutritionData(calories: 350, protein: 100, carbs: 100, fat: 50),
         target: NutritionData(calories: 2000, protein: 200, carbs: 200, fat: 50)
       ))

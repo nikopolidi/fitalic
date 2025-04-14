@@ -36,5 +36,11 @@ module.exports = {
     backgroundColor: "#000000",
     textColor: "#FFFFFF",
     accentColor: "#FF01A1"
+  },
+  images: {
+    fat: './assets/fat.png',
+    carbs: './assets/carbs.png',
+    protein: './assets/protein.png',
+    calories: './assets/calories.png',
   }
-}; 
+};

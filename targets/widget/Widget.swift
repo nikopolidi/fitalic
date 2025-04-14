@@ -13,4 +13,11 @@ class WidgetHelper {
     static func reloadWidget(kind: String) {
         WidgetCenter.shared.reloadTimelines(ofKind: kind)
     }
+}
+
+@main
+struct FitalicWidgets: WidgetBundle {
+  var body: some Widget {
+    FitalicWidget()
+  }
 } 

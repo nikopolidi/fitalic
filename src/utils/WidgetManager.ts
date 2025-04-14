@@ -1,106 +1,35 @@
-import { NativeModules } from 'react-native';
+import { ExtensionStorage } from '@bacons/apple-targets';
 
-const { WidgetManager } = NativeModules;
-
-interface WidgetSection {
-  id: string;
-  title: string;
-  color: string;
+interface NutritionData {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
 }
 
-interface WidgetStyle {
-  backgroundColor: string;
-  dividerColor: string;
-  dividerWidth: number;
-  fontSize: number;
-  fontWeight: number; // 400-900
-  padding: number;
-}
+// Создаем экземпляр хранилища для обмена данными
+const storage = new ExtensionStorage('group.com.vitalii.nikopolidi.fitalic.shared');
 
-interface WidgetData {
-  sections: WidgetSection[];
-  style: WidgetStyle;
-}
-
-const defaultStyle: WidgetStyle = {
-  backgroundColor: '#000000',
-  dividerColor: '#FFFFFF',
-  dividerWidth: 2,
-  fontSize: 16,
-  fontWeight: 600,
-  padding: 16,
+// Ключи для хранения данных
+const KEYS = {
+  TARGET_NUTRITION: 'targetNutrition',
+  CONSUMED_NUTRITION: 'consumedNutrition'
 };
 
-export const updateWidget = async (data: Partial<WidgetData>) => {
-  const defaultData: WidgetData = {
-    sections: [
-      { id: '1', title: 'Тренировка', color: '#FF3B30' },
-      { id: '2', title: 'Статистика', color: '#34C759' },
-    ],
-    style: defaultStyle,
-  };
-
-  // Объединяем дефолтные данные с переданными
-  const mergedData: WidgetData = {
-    sections: data.sections || defaultData.sections,
-    style: { ...defaultStyle, ...data.style },
-  };
-
+export const setTargetNutrition = async (data: NutritionData) => {
   try {
-    await WidgetManager.updateWidget(mergedData);
-    return true;
+    await storage.set(KEYS.TARGET_NUTRITION, JSON.stringify(data));
+    ExtensionStorage.reloadWidget()
   } catch (error) {
-    console.error('Error updating widget:', error);
-    return false;
+    console.error("Failed to set target nutrition", error);
   }
 };
 
-// Примеры использования
-export const examples = {
-  // Обновить только контент
-  updateContent: async () => {
-    return updateWidget({
-      sections: [
-        { id: '1', title: 'Новая тренировка', color: '#FF3B30' },
-        { id: '2', title: 'Прогресс', color: '#34C759' },
-      ],
-    });
-  },
-
-  // Обновить только стили
-  updateStyle: async () => {
-    return updateWidget({
-      style: {
-        backgroundColor: '#1C1C1E',
-        dividerColor: '#48484A',
-        fontSize: 18,
-        fontWeight: 700,
-        dividerWidth: 1,
-        padding: 12,
-      },
-    });
-  },
-
-  // Обновить все
-  updateAll: async () => {
-    return updateWidget({
-      sections: [
-        { id: '1', title: 'Старт', color: '#007AFF' },
-        { id: '2', title: 'Результаты', color: '#5856D6' },
-      ],
-      style: {
-        backgroundColor: '#000000',
-        dividerColor: '#FFFFFF',
-        dividerWidth: 1,
-        fontSize: 20,
-        fontWeight: 800,
-        padding: 12,
-      },
-    });
-  },
-};
-
-export default {
-  updateWidget,
-  examples,
+export const setConsumedNutrition = async (data: NutritionData) => {
+  try {
+    await storage.set(KEYS.CONSUMED_NUTRITION, JSON.stringify(data));
+    ExtensionStorage.reloadWidget()
+  } catch (error) {
+    console.error("Failed to set consumed nutrition", error);
+  }
 }; 
