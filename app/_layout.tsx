@@ -5,9 +5,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from 'react-native';
+import { ThemeProvider } from './providers/ThemeProvider';
 
 import { initializeURLHandler } from '../src/utils/URLHandler';
-import { setTargetNutrition, setConsumedNutrition } from '../src/utils/WidgetManager';
+import widgetService from '@/src/services/widgetService';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -34,14 +35,14 @@ export default function RootLayout() {
       initializeURLHandler();
       try {
         // Инициализируем виджет с дефолтными значениями
-        await setTargetNutrition({
+        await widgetService.setTargetNutrition({
           calories: 2000,
           protein: 150,
           carbs: 200,
           fat: 50
         });
 
-        await setConsumedNutrition({
+        await widgetService.setConsumedNutrition({
           calories: 500,
           protein: 30,
           carbs: 50,
@@ -70,7 +71,11 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <ThemeProvider>
+      <Stack />
+    </ThemeProvider>
+  );
 }
 
 function RootLayoutNav() {

@@ -147,14 +147,14 @@ struct WidgetEntryView: View {
         // Bottom row with microphone and keyboard
         HStack(spacing: 60) {
           // Voice input
-          Link(destination: URL(string: "fitalic://voice-input")!) {
+          Link(destination: URL(string: "fitalic://input?input=voice")!) {
             Image(systemName: "mic")
               .font(.system(size: 20))
               .foregroundColor(.white)
           }
           
           // Text input
-          Link(destination: URL(string: "fitalic://text-input")!) {
+          Link(destination: URL(string: "fitalic://input?input=keyboard")!) {
             Image(systemName: "keyboard")
               .font(.system(size: 20))
               .foregroundColor(.white)

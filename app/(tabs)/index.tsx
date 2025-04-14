@@ -1,28 +1,60 @@
 import { StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Text, View } from '@/components/Themed';
-import { setTargetNutrition, setConsumedNutrition } from '@/src/utils/WidgetManager';
+import widgetService from '@/src/services/widgetService';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { CALORIES_PER_GRAM } from '@/src/config/constants';
+console.log('widgetService',widgetService)
+const { setTargetNutrition, setConsumedNutrition } = widgetService;
 
 export default function TabOneScreen() {
+  const params = useLocalSearchParams();
+  const inputRef = useRef<TextInput>(null);
+  const [inputValue, setInputValue] = useState('');
+
+  useEffect(() => {
+    if (params.input === 'keyboard' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [params.input]);
+
   // State for consumed nutrition
-  const [consumedCalories, setConsumedCalories] = useState('0');
   const [consumedProtein, setConsumedProtein] = useState('0');
   const [consumedCarbs, setConsumedCarbs] = useState('0');
   const [consumedFat, setConsumedFat] = useState('0');
   
   // State for target nutrition
-  const [targetCalories, setTargetCalories] = useState('2000');
   const [targetProtein, setTargetProtein] = useState('150');
   const [targetCarbs, setTargetCarbs] = useState('200');
   const [targetFat, setTargetFat] = useState('70');
   
   const [result, setResult] = useState<string | null>(null);
 
+  // Calculate calories based on macros
+  const calculateCalories = (protein: string, carbs: string, fat: string) => {
+    const proteinCalories = (parseInt(protein) || 0) * CALORIES_PER_GRAM.protein;
+    const carbsCalories = (parseInt(carbs) || 0) * CALORIES_PER_GRAM.carbs;
+    const fatCalories = (parseInt(fat) || 0) * CALORIES_PER_GRAM.fat;
+    return proteinCalories + carbsCalories + fatCalories;
+  };
+
+  const consumedCalories = useMemo(() => 
+    calculateCalories(consumedProtein, consumedCarbs, consumedFat).toString(),
+    [consumedProtein, consumedCarbs, consumedFat]
+  );
+
+  const targetCalories = useMemo(() => 
+    calculateCalories(targetProtein, targetCarbs, targetFat).toString(),
+    [targetProtein, targetCarbs, targetFat]
+  );
+
   // Update target nutrition values
   const updateTargetData = async () => {
     try {
       await setTargetNutrition({
-        calories: parseInt(targetCalories) || 0,
+        calories: parseInt(targetCalories),
         protein: parseInt(targetProtein) || 0,
         carbs: parseInt(targetCarbs) || 0,
         fat: parseInt(targetFat) || 0
@@ -38,7 +70,7 @@ export default function TabOneScreen() {
   const updateConsumedData = async () => {
     try {
       await setConsumedNutrition({
-        calories: parseInt(consumedCalories) || 0,
+        calories: parseInt(consumedCalories),
         protein: parseInt(consumedProtein) || 0,
         carbs: parseInt(consumedCarbs) || 0,
         fat: parseInt(consumedFat) || 0
@@ -48,6 +80,14 @@ export default function TabOneScreen() {
     } catch (error) {
       setResult(`Error updating consumed nutrition: ${error}`);
     }
+  };
+
+  const handleMicPress = () => {
+    console.log('onMicPress');
+  };
+
+  const handleSendPress = () => {
+    console.log('onSendPress');
   };
 
   return (
@@ -62,13 +102,7 @@ export default function TabOneScreen() {
           
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Calories:</Text>
-            <TextInput
-              style={styles.input}
-              value={consumedCalories}
-              onChangeText={setConsumedCalories}
-              keyboardType="number-pad"
-              placeholder="Enter calories"
-            />
+            <Text style={styles.caloriesValue}>{consumedCalories}</Text>
           </View>
 
           <View style={styles.inputContainer}>
@@ -118,13 +152,7 @@ export default function TabOneScreen() {
           
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Calories:</Text>
-            <TextInput
-              style={styles.input}
-              value={targetCalories}
-              onChangeText={setTargetCalories}
-              keyboardType="number-pad"
-              placeholder="Enter target calories"
-            />
+            <Text style={styles.caloriesValue}>{targetCalories}</Text>
           </View>
 
           <View style={styles.inputContainer}>
@@ -173,6 +201,24 @@ export default function TabOneScreen() {
             <Text style={styles.result}>{result}</Text>
           </View>
         )}
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            placeholder="Введите текст..."
+            value={inputValue}
+            onChangeText={setInputValue}
+          />
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleMicPress}>
+              <Ionicons name="mic" size={24} color="#FF01A1" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleSendPress}>
+              <Ionicons name="send" size={24} color="#FF01A1" />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </ScrollView>
   );
@@ -184,58 +230,54 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 20,
   },
   separator: {
-    marginVertical: 30,
     height: 1,
-    width: '80%',
+    marginVertical: 20,
   },
   section: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    marginVertical: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
   },
   inputContainer: {
-    width: '100%',
-    marginVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
   },
   label: {
     fontSize: 16,
-    marginBottom: 5,
+    marginRight: 10,
   },
   input: {
-    backgroundColor: '#f0f0f0',
+    flex: 1,
     padding: 10,
-    borderRadius: 5,
-    width: '100%',
+    fontSize: 16,
+  },
+  caloriesValue: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'right',
   },
   updateButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#FF01A1',
     padding: 15,
-    borderRadius: 8,
-    width: '100%',
+    borderRadius: 10,
     alignItems: 'center',
-    marginVertical: 10,
+    marginTop: 10,
   },
   buttonText: {
     color: 'white',
@@ -244,14 +286,24 @@ const styles = StyleSheet.create({
   },
   resultContainer: {
     marginTop: 20,
-    padding: 10,
+    padding: 15,
     backgroundColor: '#f8f8f8',
-    borderRadius: 5,
-    width: '100%',
-    alignItems: 'center',
+    borderRadius: 10,
   },
   result: {
     fontSize: 16,
     color: '#333',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  button: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#444444',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

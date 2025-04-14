@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">Track your nutrition goals</string>
+    <string name="widget_title">Nutrition Goals</string>
+    <string name="widget_calories">Calories:</string>
+    <string name="widget_protein">Protein:</string>
+</resources> 
