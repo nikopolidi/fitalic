@@ -6,7 +6,10 @@
     "moduleResolution": "bundler",
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
+      ],
+      "~/*": [
+        "./app/*"
       ]
     },
     "typeRoots": [

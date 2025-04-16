@@ -1,18 +1,19 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
 import { useColorScheme } from 'react-native';
-import { ThemeProvider } from './providers/ThemeProvider';
+import 'react-native-reanimated';
 
-import { initializeURLHandler } from '../src/utils/URLHandler';
-import widgetService from '@/src/services/widgetService';
+import { initializeURLHandler } from '@/utils/URLHandler';
+// @ts-expect-error
+import widgetService from '@/services/widgetService';
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from 'expo-router';
 
 export const unstable_settings = {
@@ -71,26 +72,27 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <ThemeProvider>
-      <Stack />
-    </ThemeProvider>
-  );
+  return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const navigationTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
 
   return (
-    <Stack>
+    <Stack screenOptions={{ 
+      headerStyle: { backgroundColor: '#fff' },
+      headerTintColor: '#000', 
+      contentStyle: { backgroundColor: '#fff' }
+    }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       <Stack.Screen 
         name="section/[id]" 
-        options={{ 
+        options={{
           title: 'Секция',
           headerShown: true,
-        }} 
+        }}
       />
     </Stack>
   );
