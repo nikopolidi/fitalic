@@ -5,12 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "~/*": [
-        "./app/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "typeRoots": [
       "./types",

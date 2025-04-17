@@ -1,14 +1,16 @@
 import { useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
 
 export default function SectionScreen() {
   const { id } = useLocalSearchParams();
+  const { theme } = useUnistyles();
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Секция {id}</Text>
-      <Text style={styles.description}>
-        Это экран для секции {id} виджета. Здесь вы можете отобразить соответствующий контент.
+      <Text style={[styles.title, { color: theme.colors.text }]}>Section {id}</Text>
+      <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
+        This is a screen for section {id}. You can display relevant content here.
       </Text>
     </View>
   );
@@ -29,6 +31,5 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#666',
   },
 }); 

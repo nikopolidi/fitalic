@@ -9,13 +9,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     name: config.name || 'Fitalic',
     slug: config.slug || 'fitalic',
     version: config.version || '1.0.0',
+    scheme: config.scheme || 'fitalic',
+    newArchEnabled: true,
     orientation: config.orientation || 'portrait',
-    icon: config.icon || './assets/images/icon.png',
+    icon: config.icon || './assets/images/app_icons/ios/icon-1024.png',
     userInterfaceStyle: config.userInterfaceStyle || 'light',
     splash: config.splash || {
-      image: './assets/images/splash-icon.png',
+      image: './assets/images/app_icons/ios/icon-1024.png',
       resizeMode: 'contain',
-      backgroundColor: '#ffffff'
+      backgroundColor: '#000000'
     },
     assetBundlePatterns: config.assetBundlePatterns || ['**/*'],
     ios: {
@@ -23,14 +25,47 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       supportsTablet: true,
       bundleIdentifier: config.ios?.bundleIdentifier || 'com.fitalic.app',
       appleTeamId: config.ios?.appleTeamId || '28UPFCTKBR',
+      icon: './assets/images/app_icons/ios/icon-1024.png',
+      // icons: {
+      //   iphone: {
+      //     '2x': './assets/images/app_icons/ios/icon-60@2x.png',
+      //     '3x': './assets/images/app_icons/ios/icon-60@3x.png'
+      //   },
+      //   ipad: {
+      //     '2x': './assets/images/app_icons/ios/icon-76@2x.png'
+      //   },
+      //   ipadPro: {
+      //     '2x': './assets/images/app_icons/ios/icon-83.5@2x.png'
+      //   },
+      //   notification: {
+      //     '2x': './assets/images/app_icons/ios/icon-40@2x.png',
+      //     '3x': './assets/images/app_icons/ios/icon-60@3x.png'
+      //   },
+      //   settings: {
+      //     '2x': './assets/images/app_icons/ios/icon-29@2x.png',
+      //     '3x': './assets/images/app_icons/ios/icon-29@3x.png'
+      //   },
+      //   spotlight: {
+      //     '2x': './assets/images/app_icons/ios/icon-40@2x.png',
+      //     '3x': './assets/images/app_icons/ios/icon-40@3x.png'
+      //   }
+      // }
     },
     android: {
       ...config.android,
       adaptiveIcon: {
-        foregroundImage: './assets/images/icon.png',
-        backgroundColor: '#FFFFFF'
+        foregroundImage: './assets/images/app_icons/ios/icon-1024.png',
+        backgroundColor: '#000000'
       },
-      package: config.android?.package || 'com.fitalic.app'
+      icon: './assets/images/app_icons/ios/icon-1024.png',
+      package: config.android?.package || 'com.fitalic.app',
+      // icons: {
+      //   mdpi: './assets/images/app_icons/android/mipmap-mdpi/ic_launcher.png',
+      //   hdpi: './assets/images/app_icons/android/mipmap-hdpi/ic_launcher.png',
+      //   xhdpi: './assets/images/app_icons/android/mipmap-xhdpi/ic_launcher.png',
+      //   xxhdpi: './assets/images/app_icons/android/mipmap-xxhdpi/ic_launcher.png',
+      //   xxxhdpi: './assets/images/app_icons/android/mipmap-xxxhdpi/ic_launcher.png'
+      // }
     },
     plugins: [
       'expo-router',
@@ -39,10 +74,23 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           ios: {
             useFrameworks: 'static',
-            deploymentTarget: '18.0'
+            deploymentTarget: '18.0',
+            enableBitcode: false,
+            buildConfiguration: 'Debug',
+            enableModules: true,
+            enableCxxModules: true,
+            enableSwiftModules: true,
+            enableObjcModules: true,
+            enableCxxInterop: true,
+            enableSwiftInterop: true,
+            enableObjcInterop: true,
+            enableCxxInteropModules: true,
+            enableSwiftInteropModules: true,
+            enableObjcInteropModules: true
           }
         }
       ],
+      './plugins/withIosDeploymentTarget',
       '@bacons/apple-targets',
       [
         './plugins/withAndroidWidget',

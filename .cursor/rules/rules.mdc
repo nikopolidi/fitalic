@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+- this is react-native expo project with expo-dev-client meaning ios and android folders are generated upon bun prepare
+- never modify content of ios and android folder. 
+- expo app config is located at app.config.ts file
+- project is using expo-router which is file based router contained in src/app
+- path alias for ./src folder is @/
+- src contains app and project components,services,config,providers when adding new items it should be place to appropriate folder
+- typescript types prefered over interfaces
+- for any text added to the code always use english, even for comments
+- всегда используй в коде английский язык и в коде и вкомментариях
