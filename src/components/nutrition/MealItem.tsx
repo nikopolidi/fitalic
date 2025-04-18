@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Meal } from '../../types/database';
 
 type MealItemProps = {
@@ -17,6 +18,8 @@ export const MealItem: React.FC<MealItemProps> = ({
   onPress,
   targetCalories = 2000 
 }) => {
+  const { theme } = useUnistyles();
+
   // Format date to readable string
   const formatDate = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -77,19 +80,19 @@ export const MealItem: React.FC<MealItemProps> = ({
         <Text style={styles.caloriePercentage}>{caloriePercentage}%</Text>
       </View>
       
-      <FontAwesome name="chevron-right" size={16} color="#C7C7CC" style={styles.chevron} />
+      <FontAwesome name="chevron-right" size={16} color={theme.colors.borderLight} style={styles.chevron} />
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm + 4,
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -97,64 +100,66 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeContainer: {
-    marginRight: 12,
+    marginRight: theme.spacing.sm + 4,
     alignItems: 'center',
     minWidth: 60,
   },
   time: {
-    fontSize: 14,
+    fontSize: theme.typography.bodySmall.fontSize,
     fontWeight: '600',
-    color: '#007AFF',
+    color: theme.colors.primary,
   },
   mealType: {
-    fontSize: 12,
-    color: '#8E8E93',
-    marginTop: 4,
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
   },
   contentContainer: {
     flex: 1,
     justifyContent: 'center',
   },
   mealName: {
-    fontSize: 16,
+    fontSize: theme.typography.body.fontSize,
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.text,
   },
   nutritionContainer: {
     flexDirection: 'row',
   },
   macroContainer: {
-    marginRight: 16,
+    marginRight: theme.spacing.md,
   },
   macroLabel: {
-    fontSize: 12,
-    color: '#8E8E93',
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.textSecondary,
   },
   macroValue: {
-    fontSize: 14,
+    fontSize: theme.typography.bodySmall.fontSize,
     fontWeight: '500',
+    color: theme.colors.text,
   },
   calorieContainer: {
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: theme.spacing.sm,
   },
   calories: {
-    fontSize: 18,
+    fontSize: theme.typography.h3.fontSize,
     fontWeight: '700',
-    color: '#007AFF',
+    color: theme.colors.primary,
   },
   calorieUnit: {
-    fontSize: 12,
-    color: '#8E8E93',
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.textSecondary,
   },
   caloriePercentage: {
-    fontSize: 12,
-    color: '#8E8E93',
-    marginTop: 2,
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs - 2,
   },
   chevron: {
-    marginLeft: 4,
+    marginLeft: theme.spacing.xs,
   },
-});
+}));
 
 export default MealItem;

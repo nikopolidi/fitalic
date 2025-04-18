@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
-import MealItem from './MealItem';
 import { useNutritionStore, useUserStore } from '../../services/storage';
-import { Meal, DailyNutrition } from '../../types/database';
+import { Meal } from '../../types/database';
+import MealItem from './MealItem';
 
 /**
  * Component for displaying the nutrition tracking list
@@ -14,6 +15,7 @@ export const NutritionList: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useUnistyles();
   
   // Get nutrition data from store
   const nutritionStore = useNutritionStore();
@@ -83,7 +85,7 @@ export const NutritionList: React.FC = () => {
           style={styles.dateButton}
           onPress={() => changeDate(-1)}
         >
-          <FontAwesome name="chevron-left" size={16} color="#007AFF" />
+          <FontAwesome name="chevron-left" size={16} color={theme.colors.primary} />
         </TouchableOpacity>
         
         <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
@@ -92,7 +94,7 @@ export const NutritionList: React.FC = () => {
           style={styles.dateButton}
           onPress={() => changeDate(1)}
         >
-          <FontAwesome name="chevron-right" size={16} color="#007AFF" />
+          <FontAwesome name="chevron-right" size={16} color={theme.colors.primary} />
         </TouchableOpacity>
       </View>
       
@@ -188,13 +190,13 @@ export const NutritionList: React.FC = () => {
           style={styles.addButton}
           onPress={handleAddMeal}
         >
-          <FontAwesome name="plus" size={16} color="#FFFFFF" />
+          <FontAwesome name="plus" size={16} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
       
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : meals.length > 0 ? (
         <FlatList
@@ -212,7 +214,7 @@ export const NutritionList: React.FC = () => {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <FontAwesome name="cutlery" size={48} color="#C7C7CC" />
+          <FontAwesome name="cutlery" size={48} color={theme.colors.borderLight} />
           <Text style={styles.emptyText}>No meals recorded for this day</Text>
           <TouchableOpacity 
             style={styles.emptyButton}
@@ -226,39 +228,40 @@ export const NutritionList: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
+    paddingVertical: theme.spacing.sm + 4,
+    backgroundColor: theme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: theme.colors.border,
   },
   dateButton: {
-    padding: 8,
+    padding: theme.spacing.sm,
   },
   dateText: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginHorizontal: 16,
+    fontSize: theme.typography.h3.fontSize,
+    fontWeight: theme.typography.h3.fontWeight,
+    marginHorizontal: theme.spacing.md,
+    color: theme.colors.text,
   },
   summaryContainer: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    marginTop: 12,
-    marginHorizontal: 16,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.md,
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowRadius: 3,
     elevation: 2,
   },
   summaryItem: {
@@ -266,96 +269,98 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryLabel: {
-    fontSize: 14,
-    color: '#8E8E93',
-    marginBottom: 4,
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xs,
   },
   summaryValue: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: theme.typography.h3.fontSize,
+    fontWeight: '600',
+    color: theme.colors.text,
   },
   summaryUnit: {
-    fontSize: 14,
-    fontWeight: '400',
-  },
-  negativeValue: {
-    color: '#FF3B30',
+    fontSize: theme.typography.bodySmall.fontSize,
+    color: theme.colors.textSecondary,
   },
   divider: {
     width: 1,
-    backgroundColor: '#E5E5EA',
-    marginHorizontal: 8,
+    height: '100%',
+    backgroundColor: theme.colors.border,
+  },
+  negativeValue: {
+    color: theme.colors.error,
   },
   macroContainer: {
-    backgroundColor: '#FFFFFF',
-    marginTop: 12,
-    marginHorizontal: 16,
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.md,
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowRadius: 3,
     elevation: 2,
   },
   macroItem: {
-    marginBottom: 12,
+    marginBottom: theme.spacing.sm,
   },
   macroLabel: {
-    fontSize: 14,
-    color: '#8E8E93',
+    fontSize: theme.typography.bodySmall.fontSize,
+    color: theme.colors.textSecondary,
   },
   macroValue: {
-    fontSize: 16,
+    fontSize: theme.typography.body.fontSize,
     fontWeight: '600',
-    marginVertical: 4,
+    color: theme.colors.text,
   },
   macroUnit: {
-    fontSize: 12,
-    fontWeight: '400',
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.textSecondary,
   },
   progressBarContainer: {
-    height: 6,
-    backgroundColor: '#E5E5EA',
-    borderRadius: 3,
+    height: 8,
+    backgroundColor: theme.colors.backgroundSecondary,
+    borderRadius: theme.borderRadius.full,
+    marginTop: theme.spacing.xs,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    borderRadius: 3,
   },
   proteinBar: {
-    backgroundColor: '#5856D6',
+    backgroundColor: theme.colors.primary,
   },
   carbsBar: {
-    backgroundColor: '#FF9500',
+    backgroundColor: theme.colors.secondary,
   },
   fatBar: {
-    backgroundColor: '#FF2D55',
+    backgroundColor: theme.colors.warning,
   },
   listHeaderContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 20,
-    marginHorizontal: 16,
-    marginBottom: 8,
+    alignItems: 'center',
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.sm,
   },
   listHeaderText: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: theme.typography.h3.fontSize,
+    fontWeight: theme.typography.h3.fontWeight,
+    color: theme.colors.text,
   },
   addButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: theme.borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: theme.spacing.md,
+    paddingBottom: theme.spacing.lg,
   },
   loadingContainer: {
     flex: 1,
@@ -366,26 +371,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: theme.spacing.xl,
   },
   emptyText: {
-    fontSize: 16,
-    color: '#8E8E93',
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.textSecondary,
     textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
   },
   emptyButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 20,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.borderRadius.full,
   },
   emptyButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: theme.colors.text,
+    fontSize: theme.typography.body.fontSize,
     fontWeight: '600',
   },
-});
+}));
 
 export default NutritionList;

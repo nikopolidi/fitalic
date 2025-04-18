@@ -26,10 +26,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Chat',
           tabBarIcon: ({ focused, color }) => 
             <TabBarIcon 
-              name="home"
+              name="comment-o"
+              color='primary'
+            />,
+        }}
+      />
+      <Tabs.Screen
+        name="nutrition"
+        options={{
+          title: 'Nutrition',
+          tabBarIcon: ({ focused, color }) => 
+            <TabBarIcon 
+              name="user"
               color='primary'
             />,
         }}
@@ -40,7 +51,7 @@ export default function TabLayout() {
           title: 'Profile',
           tabBarIcon: ({ focused, color }) => 
             <TabBarIcon 
-              name="user"
+              name="cutlery"
               color='primary'
             />,
         }}

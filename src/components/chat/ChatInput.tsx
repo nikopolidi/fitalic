@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Keyboard } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React, { useRef, useState } from 'react';
+import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type ChatInputProps = {
   onSendMessage: (text: string) => void;
@@ -22,7 +23,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const [message, setMessage] = useState('');
   const inputRef = useRef<TextInput>(null);
-
+  const { theme } = useUnistyles();
+  
   const handleSend = () => {
     if (message.trim()) {
       onSendMessage(message.trim());
@@ -45,7 +47,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         style={styles.attachButton} 
         onPress={onAttachmentPress}
       >
-        <FontAwesome name="paperclip" size={20} color="#007AFF" />
+        <FontAwesome name="paperclip" size={20} color={theme.colors.primary} />
       </TouchableOpacity>
       
       <TextInput
@@ -54,7 +56,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         value={message}
         onChangeText={setMessage}
         placeholder="Type a message..."
-        placeholderTextColor="#8E8E93"
+        placeholderTextColor={theme.colors.textTertiary}
         multiline
         maxLength={1000}
         editable={!isRecording}
@@ -62,7 +64,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       
       {message.trim() ? (
         <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-          <FontAwesome name="send" size={20} color="#FFFFFF" />
+          <FontAwesome name="send" size={20} color={theme.colors.text} />
         </TouchableOpacity>
       ) : (
         <TouchableOpacity 
@@ -72,7 +74,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <FontAwesome 
             name={isRecording ? "stop" : "microphone"} 
             size={20} 
-            color={isRecording ? "#FFFFFF" : "#007AFF"} 
+            color={isRecording ? theme.colors.text : theme.colors.primary} 
           />
         </TouchableOpacity>
       )}
@@ -80,53 +82,54 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: '#F2F2F7',
+    paddingHorizontal: theme.spacing.md - 4,
+    paddingVertical: theme.spacing.sm,
+    backgroundColor: theme.colors.surfaceSecondary,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
+    borderTopColor: theme.colors.border,
   },
   attachButton: {
-    padding: 8,
-    marginRight: 8,
+    padding: theme.spacing.sm,
+    marginRight: theme.spacing.sm,
   },
   input: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.full,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm + 2,
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.text,
     maxHeight: 120,
   },
   sendButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: theme.borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: theme.spacing.sm,
   },
   micButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: theme.borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: theme.colors.primary,
   },
   recordingButton: {
-    backgroundColor: '#FF3B30',
-    borderColor: '#FF3B30',
+    backgroundColor: theme.colors.error,
+    borderColor: theme.colors.error,
   },
-});
+}));
 
 export default ChatInput;

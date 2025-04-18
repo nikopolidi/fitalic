@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
+import { Dimensions, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useProgressStore } from '../../services/storage';
 import { ProgressPhoto } from '../../types/database';
 
@@ -14,7 +14,7 @@ export const ProgressGallery: React.FC = () => {
   
   // Get progress photos from store
   const progressStore = useProgressStore();
-  const photos = progressStore.progressPhotos;
+  const photos = progressStore.progressData.photos;
   
   // Screen dimensions for grid layout
   const screenWidth = Dimensions.get('window').width;
@@ -43,10 +43,9 @@ export const ProgressGallery: React.FC = () => {
         const photoUri = result.assets[0].uri;
         
         // Add progress photo
-        progressStore.addProgressPhoto({
-          id: `photo_${Date.now()}`,
-          uri: photoUri,
-          timestamp: Date.now(),
+        progressStore.addPhoto({
+          imageUri: photoUri,
+          date: Date.now(),
           notes: '',
         });
       }
@@ -63,7 +62,7 @@ export const ProgressGallery: React.FC = () => {
   
   // Delete photo
   const handleDeletePhoto = (photoId: string) => {
-    progressStore.deleteProgressPhoto(photoId);
+    progressStore.deletePhoto(photoId);
     setIsModalVisible(false);
   };
   
@@ -83,9 +82,9 @@ export const ProgressGallery: React.FC = () => {
       style={[styles.photoItem, { width: itemSize, height: itemSize * 1.33 }]}
       onPress={() => handlePhotoPress(item)}
     >
-      <Image source={{ uri: item.uri }} style={styles.photo} />
+      <Image source={{ uri: item.imageUri }} style={styles.photo} />
       <View style={styles.photoDateOverlay}>
-        <Text style={styles.photoDate}>{formatDate(item.timestamp)}</Text>
+        <Text style={styles.photoDate}>{formatDate(item.date)}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -140,8 +139,8 @@ export const ProgressGallery: React.FC = () => {
           <View style={styles.modalContent}>
             {selectedPhoto && (
               <>
-                <Image source={{ uri: selectedPhoto.uri }} style={styles.modalImage} />
-                <Text style={styles.modalDate}>{formatDate(selectedPhoto.timestamp)}</Text>
+                <Image source={{ uri: selectedPhoto.imageUri }} style={styles.modalImage} />
+                <Text style={styles.modalDate}>{formatDate(selectedPhoto.date)}</Text>
                 {selectedPhoto.notes && (
                   <Text style={styles.modalNotes}>{selectedPhoto.notes}</Text>
                 )}

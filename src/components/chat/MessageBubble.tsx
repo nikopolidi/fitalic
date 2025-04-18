@@ -1,6 +1,6 @@
-
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { ChatMessage } from '../../types/database';
 
 type MessageBubbleProps = {
@@ -61,66 +61,66 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     maxWidth: '80%',
-    padding: 12,
-    borderRadius: 16,
-    marginVertical: 4,
+    padding: theme.spacing.md - 4,
+    borderRadius: theme.borderRadius.lg,
+    marginVertical: theme.spacing.xs,
   },
   userContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#007AFF',
-    borderBottomRightRadius: 4,
+    backgroundColor: theme.colors.primary,
+    borderBottomRightRadius: theme.borderRadius.xs,
   },
   assistantContainer: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E9E9EB',
-    borderBottomLeftRadius: 4,
+    backgroundColor: theme.colors.surfaceSecondary,
+    borderBottomLeftRadius: theme.borderRadius.xs,
   },
   lastMessage: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   text: {
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: theme.typography.body.fontSize,
+    lineHeight: theme.typography.body.lineHeight,
   },
   userText: {
-    color: '#FFFFFF',
+    color: theme.colors.text,
   },
   assistantText: {
-    color: '#000000',
+    color: theme.colors.text,
   },
   timestamp: {
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: theme.typography.caption.fontSize,
+    marginTop: theme.spacing.xs,
     alignSelf: 'flex-end',
     opacity: 0.7,
   },
   attachmentContainer: {
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   attachment: {
-    marginBottom: 4,
-    borderRadius: 12,
+    marginBottom: theme.spacing.xs,
+    borderRadius: theme.borderRadius.md,
     overflow: 'hidden',
   },
   attachmentImage: {
     width: '100%',
     height: 200,
-    borderRadius: 12,
+    borderRadius: theme.borderRadius.md,
   },
   audioAttachment: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    padding: 12,
-    borderRadius: 12,
+    backgroundColor: theme.colors.opacity(theme.colors.surface, 0.05),
+    padding: theme.spacing.md - 4,
+    borderRadius: theme.borderRadius.md,
     flexDirection: 'row',
     alignItems: 'center',
   },
   audioText: {
-    fontSize: 14,
-    marginLeft: 8,
+    fontSize: theme.typography.bodySmall.fontSize,
+    marginLeft: theme.spacing.sm,
   },
-});
+}));
 
 export default MessageBubble;

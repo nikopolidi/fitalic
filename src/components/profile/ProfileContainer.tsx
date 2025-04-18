@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import ProfileScreen from './ProfileScreen';
 
 /**
@@ -14,11 +15,11 @@ export const ProfileContainer: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: theme.colors.background,
   },
-});
+}));
 
 export default ProfileContainer;

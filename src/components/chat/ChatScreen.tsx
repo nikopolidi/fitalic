@@ -1,25 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator, Text, KeyboardAvoidingView, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import { FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { Audio } from 'expo-av';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
-import MessageBubble from './MessageBubble';
-import ChatInput from './ChatInput';
-import { useChatStore } from '../../services/storage';
 import { AITrainerService } from '../../services/ai';
-import { ChatMessage } from '../../types/database';
+import { useChatStore } from '../../services/storage';
+import ChatInput from './ChatInput';
+import MessageBubble from './MessageBubble';
 
 /**
  * Main chat screen component
  */
 export const ChatScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const flatListRef = useRef<FlatList>(null);
+  const { theme } = useUnistyles();
 
   // Get chat messages from store
   const chatStore = useChatStore();
@@ -35,6 +38,52 @@ export const ChatScreen: React.FC = () => {
       startInitialAssessment();
     }
   }, [currentSession]);
+
+  // Функция очистки истории чата
+  const clearChatHistory = () => {
+    if (messages.length === 0) return;
+    
+    Alert.alert(
+      "Очистить историю чата",
+      "Вы уверены, что хотите удалить все сообщения? Это действие нельзя отменить.",
+      [
+        {
+          text: "Отмена",
+          style: "cancel"
+        },
+        { 
+          text: "Удалить", 
+          onPress: () => {
+            if (currentSession) {
+              // Используем метод для очистки сообщений - предположу что нужно создать новую сессию
+              chatStore.createSession();
+            }
+          },
+          style: "destructive"
+        }
+      ]
+    );
+  };
+
+  // Настройка хедера с кнопкой удаления
+  useLayoutEffect(() => {
+    const isEmpty = messages.length === 0;
+    
+    navigation.setOptions({
+      headerRight: () => (
+        <FontAwesome 
+          name="trash-o" 
+          size={22} 
+          color={isEmpty ? theme.colors.textTertiary : theme.colors.error}
+          style={{ 
+            marginRight: 16,
+            opacity: isEmpty ? 0.5 : 1 
+          }} 
+          onPress={clearChatHistory}
+        />
+      ),
+    });
+  }, [navigation, theme.colors.error, theme.colors.textTertiary, messages.length]);
 
   // Start initial assessment
   const startInitialAssessment = async () => {
@@ -190,7 +239,7 @@ export const ChatScreen: React.FC = () => {
       
       {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#007AFF" />
+          <ActivityIndicator size="small" color={theme.colors.primary} />
           <Text style={styles.loadingText}>Thinking...</Text>
         </View>
       )}
@@ -206,30 +255,30 @@ export const ChatScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.background,
   },
   messagesContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: theme.spacing.md,
+    paddingBottom: theme.spacing.md,
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginBottom: 8,
+    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.opacity(theme.colors.surface, 0.05),
+    borderRadius: theme.borderRadius.lg,
+    marginHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   loadingText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#007AFF',
-  },
-});
+    marginLeft: theme.spacing.sm,
+    fontSize: theme.typography.bodySmall.fontSize,
+    color: theme.colors.primary,
+  }
+}));
 
 export default ChatScreen;

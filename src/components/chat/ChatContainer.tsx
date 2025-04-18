@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import ChatScreen from './ChatScreen';
 
 /**
@@ -14,11 +15,11 @@ export const ChatContainer: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.background,
   },
-});
+}));
 
 export default ChatContainer;

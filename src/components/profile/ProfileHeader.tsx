@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet as UnistyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useUserStore } from '../../services/storage';
 
 type ProfileHeaderProps = {
@@ -15,6 +16,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onEditPress,
   onAvatarPress
 }) => {
+  const { theme } = useUnistyles();
   // Get user data from store
   const userStore = useUserStore();
   const user = userStore.user;
@@ -56,11 +58,11 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <Image source={{ uri: user.avatarUri }} style={styles.avatar} />
         ) : (
           <View style={styles.avatarPlaceholder}>
-            <FontAwesome name="user" size={40} color="#FFFFFF" />
+            <FontAwesome name="user" size={40} color={theme.colors.white} />
           </View>
         )}
         <View style={styles.editAvatarButton}>
-          <FontAwesome name="camera" size={14} color="#FFFFFF" />
+          <FontAwesome name="camera" size={14} color={theme.colors.white} />
         </View>
       </TouchableOpacity>
       
@@ -88,20 +90,20 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       </View>
       
       <TouchableOpacity style={styles.editButton} onPress={onEditPress}>
-        <FontAwesome name="edit" size={16} color="#FFFFFF" style={styles.editIcon} />
+        <FontAwesome name="edit" size={16} color={theme.colors.white} style={styles.editIcon} />
         <Text style={styles.editButtonText}>Edit Profile</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = UnistyleSheet.create(({ theme }) => ({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.white,
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: theme.colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#C7C7CC',
+    backgroundColor: theme.colors.gray5,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -129,19 +131,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     width: 30,
     height: 30,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: theme.colors.white,
   },
   name: {
     fontSize: 24,
     fontWeight: '600',
     marginBottom: 16,
+    color: theme.colors.text,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -156,22 +159,22 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#007AFF',
+    color: theme.colors.primary,
   },
   statLabel: {
     fontSize: 12,
-    color: '#8E8E93',
+    color: theme.colors.gray,
     marginTop: 4,
     textAlign: 'center',
   },
   statDivider: {
     width: 1,
-    backgroundColor: '#E5E5EA',
+    backgroundColor: theme.colors.divider,
     marginHorizontal: 8,
   },
   editButton: {
     flexDirection: 'row',
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -181,27 +184,27 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   editButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.white,
     fontSize: 16,
     fontWeight: '600',
   },
   setupText: {
     fontSize: 18,
-    color: '#8E8E93',
+    color: theme.colors.gray,
     marginBottom: 16,
     textAlign: 'center',
   },
   setupButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
   },
   setupButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.white,
     fontSize: 16,
     fontWeight: '600',
   },
-});
+}));
 
 export default ProfileHeader;

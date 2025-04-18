@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
-import ProfileHeader from './ProfileHeader';
+import { useProgressStore, useUserStore } from '../../services/storage';
 import AnthropometryForm from './AnthropometryForm';
+import ProfileHeader from './ProfileHeader';
 import ProgressGallery from './ProgressGallery';
 import WeightTracker from './WeightTracker';
-import { useUserStore, useProgressStore } from '../../services/storage';
 
 /**
  * Main profile screen component
@@ -15,6 +16,7 @@ import { useUserStore, useProgressStore } from '../../services/storage';
 export const ProfileScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [isEditMode, setIsEditMode] = useState(false);
+  const { theme } = useUnistyles();
   
   // Get user data from store
   const userStore = useUserStore();
@@ -67,7 +69,10 @@ export const ProfileScreen: React.FC = () => {
   };
   
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={{
+      ...styles.container, 
+      paddingTop: insets.top
+    }}>
       {isEditMode ? (
         <AnthropometryForm
           onSave={handleSaveProfile}
@@ -115,10 +120,10 @@ export const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: 'transparent',
   },
   sectionContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
     borderRadius: 12,
     padding: 16,
     margin: 16,
@@ -130,9 +135,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
     marginBottom: 16,
+    color: '#000',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -140,24 +146,25 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
+    backgroundColor: '#FF00FF',
+    borderRadius: 4,
     padding: 12,
     alignItems: 'center',
     marginHorizontal: 4,
   },
   actionButtonText: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 14,
     fontWeight: '600',
   },
   settingItem: {
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: '#333',
   },
   settingText: {
     fontSize: 16,
+    color: '#000',
   },
 });
 
