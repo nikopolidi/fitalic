@@ -1,7 +1,6 @@
+import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
 import { NutritionList } from '../../../src/components/nutrition/NutritionList';
-import { createStyleSheet } from 'react-native-unistyles';
 import { useNutritionStore } from '../../../src/services/storage/nutritionStore';
 import { useUserStore } from '../../../src/services/storage/userStore';
 
@@ -86,7 +85,7 @@ describe('NutritionList', () => {
       protein: 20,
       carbs: 40,
       fat: 15,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       imageUri: null,
       notes: 'Oatmeal with fruits',
     },
@@ -97,7 +96,7 @@ describe('NutritionList', () => {
       protein: 35,
       carbs: 60,
       fat: 20,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       imageUri: null,
       notes: 'Chicken salad',
     },

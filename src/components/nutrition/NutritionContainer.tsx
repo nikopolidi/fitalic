@@ -1,15 +1,22 @@
 import React from 'react';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
-import NutritionList from './NutritionList';
 import { useNutritionStore } from '../../services/storage/nutritionStore';
 import { useUserStore } from '../../services/storage/userStore';
+import NutritionList from './NutritionList';
 
 /**
  * Container component for the nutrition tab
  */
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+}));
+
+
 export const NutritionContainer: React.FC = () => {
-  const styles = useStyles();
   const { 
     meals, 
     isLoading, 
@@ -46,11 +53,5 @@ export const NutritionContainer: React.FC = () => {
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-}));
 
 export default NutritionContainer;

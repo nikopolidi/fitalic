@@ -3,8 +3,8 @@
  */
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { Anthropometry, FitnessGoal, NutritionGoals, UserData, UserPreferences } from '../../types/database';
 import { storage } from './mmkv';
-import { UserData, Anthropometry, NutritionGoals, UserPreferences, Gender, ActivityLevel, FitnessGoal } from '../../types/database';
 
 // Default values for a new user
 const DEFAULT_ANTHROPOMETRY: Anthropometry = {
@@ -39,6 +39,7 @@ interface UserStore {
   
   // Actions
   initializeUser: (name: string) => void;
+  updateUser: (data: Partial<UserData>) => void;
   updateAnthropometry: (data: Partial<Anthropometry>) => void;
   updateNutritionGoals: (goals: Partial<NutritionGoals>) => void;
   updatePreferences: (prefs: Partial<UserPreferences>) => void;
@@ -72,6 +73,30 @@ export const useUserStore = create<UserStore>()(
           },
           isInitialized: true,
         });
+      },
+      
+      updateUser: (data: Partial<UserData>) => {
+        const { user } = get();
+        if (!user) return;
+        
+        // Deep merge would be more robust, but a shallow merge works for top-level fields
+        // and replaces nested objects entirely if they are provided in 'data'.
+        // For partial nested updates, use specific methods like updateAnthropometry.
+        set({
+          user: {
+            ...user,
+            ...data, // Apply updates from data
+            // Ensure nested objects are handled correctly if provided in data
+            anthropometry: data.anthropometry ? { ...user.anthropometry, ...data.anthropometry } : user.anthropometry,
+            nutritionGoals: data.nutritionGoals ? { ...user.nutritionGoals, ...data.nutritionGoals } : user.nutritionGoals,
+            preferences: data.preferences ? { ...user.preferences, ...data.preferences } : user.preferences,
+            updatedAt: Date.now(), // Always update the timestamp
+          },
+        });
+
+        // Note: This simple updateUser doesn't automatically trigger recalculations
+        // like updateAnthropometry or updatePreferences do.
+        // If fitnessGoal or anthropometry changes via updateUser, goals won't auto-recalculate here.
       },
       
       updateAnthropometry: (data: Partial<Anthropometry>) => {

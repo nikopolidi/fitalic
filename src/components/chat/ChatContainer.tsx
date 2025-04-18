@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
-import ChatScreen from './ChatScreen';
 import { useChatStore } from '../../services/storage/chatStore';
+import ChatScreen from './ChatScreen';
 
 /**
  * Container component for the chat tab

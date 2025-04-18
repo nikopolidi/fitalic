@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { View, TextInput, TouchableOpacity, Keyboard } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { FontAwesome } from '@expo/vector-icons';
+import React, { useRef, useState } from 'react';
+import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type ChatInputProps = {
   onSendMessage: (text: string) => void;

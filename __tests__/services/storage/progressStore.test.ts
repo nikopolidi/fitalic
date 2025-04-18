@@ -1,6 +1,6 @@
-import { renderHook, act } from '@testing-library/react-hooks';
-import { useProgressStore } from '../../../src/services/storage/progressStore';
+import { act, renderHook } from '@testing-library/react-hooks';
 import { MMKV } from 'react-native-mmkv';
+import { useProgressStore } from '../../../src/services/storage/progressStore';
 
 // Mock MMKV
 jest.mock('react-native-mmkv', () => {
@@ -36,7 +36,7 @@ describe('ProgressStore', () => {
     const newEntry = {
       id: 'test-id',
       weight: 75,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       notes: 'Test notes',
     };
     
@@ -55,7 +55,7 @@ describe('ProgressStore', () => {
     const entry = {
       id: 'test-id',
       weight: 75,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       notes: 'Test notes',
     };
     
@@ -86,7 +86,7 @@ describe('ProgressStore', () => {
     const entry = {
       id: 'test-id',
       weight: 75,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       notes: 'Test notes',
     };
     
@@ -110,7 +110,7 @@ describe('ProgressStore', () => {
     const newPhoto = {
       id: 'test-id',
       uri: 'file:///test/photo.jpg',
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       type: 'front' as const,
       notes: 'Test notes',
     };
@@ -130,7 +130,7 @@ describe('ProgressStore', () => {
     const photo = {
       id: 'test-id',
       uri: 'file:///test/photo.jpg',
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       type: 'front' as const,
       notes: 'Test notes',
     };
@@ -203,7 +203,7 @@ describe('ProgressStore', () => {
     const frontPhoto = {
       id: 'test-id-1',
       uri: 'file:///test/front.jpg',
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       type: 'front' as const,
       notes: 'Front view',
     };
@@ -211,7 +211,7 @@ describe('ProgressStore', () => {
     const sidePhoto = {
       id: 'test-id-2',
       uri: 'file:///test/side.jpg',
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       type: 'side' as const,
       notes: 'Side view',
     };
@@ -235,14 +235,14 @@ describe('ProgressStore', () => {
     const entry = {
       id: 'test-id',
       weight: 75,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       notes: 'Test notes',
     };
     
     const photo = {
       id: 'test-id',
       uri: 'file:///test/photo.jpg',
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       type: 'front' as const,
       notes: 'Test notes',
     };

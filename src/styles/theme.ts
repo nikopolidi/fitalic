@@ -1,4 +1,3 @@
-import { UnistylesThemes } from 'react-native-unistyles';
 
 export const darkTheme = {
   colors: {
@@ -262,13 +261,6 @@ export const darkTheme = {
       return colors[variant];
     },
   },
-};
-
-// Type definition for themes
-declare module 'react-native-unistyles' {
-  export interface UnistylesThemes {
-    dark: typeof darkTheme;
-  }
-}
+} as const;
 
 export type AppTheme = typeof darkTheme; 

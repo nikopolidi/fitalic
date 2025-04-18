@@ -1,8 +1,8 @@
+import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { Meal } from '../../types/database';
-import { FontAwesome } from '@expo/vector-icons';
 
 type MealItemProps = {
   meal: Meal;

@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, TextInput } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { FontAwesome } from '@expo/vector-icons';
-import { WeightEntry } from '../../types/database';
+import React, { useState } from 'react';
+import { Dimensions, FlatList, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { WeightEntry } from '../../types/database';
 
 type WeightTrackerProps = {
   entries: WeightEntry[];
@@ -21,18 +20,17 @@ export const WeightTracker: React.FC<WeightTrackerProps> = ({
   onDeleteEntry
 }) => {
   const { theme } = useUnistyles();
-  const styles = useStyles();
   const [showAddModal, setShowAddModal] = useState(false);
   const [weight, setWeight] = useState('');
   const [note, setNote] = useState('');
   
   const screenWidth = Dimensions.get('window').width - (theme.spacing.md * 2);
   
-  const sortedEntries = [...entries].sort((a, b) => a.timestamp - b.timestamp);
+  const sortedEntries = [...entries].sort((a, b) => a.date - b.date);
   
   const chartData = {
     labels: sortedEntries.map(entry => {
-      const date = new Date(entry.timestamp);
+      const date = new Date(entry.date);
       return `${date.getMonth() + 1}/${date.getDate()}`;
     }),
     datasets: [
@@ -59,10 +57,10 @@ export const WeightTracker: React.FC<WeightTrackerProps> = ({
       <View style={styles.entryInfo}>
         <Text style={styles.entryWeight}>{item.weight} kg</Text>
         <Text style={styles.entryDate}>
-          {new Date(item.timestamp).toLocaleDateString()}
+          {new Date(item.date).toLocaleDateString()}
         </Text>
-        {item.note && (
-          <Text style={styles.entryNote}>{item.note}</Text>
+        {item.notes && (
+          <Text style={styles.entryNote}>{item.notes}</Text>
         )}
       </View>
       
@@ -130,7 +128,7 @@ export const WeightTracker: React.FC<WeightTrackerProps> = ({
         </View>
       ) : (
         <FlatList
-          data={[...entries].sort((a, b) => b.timestamp - a.timestamp)}
+          data={[...entries].sort((a, b) => b.date - a.date)}
           renderItem={renderEntry}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.entriesList}
@@ -198,7 +196,7 @@ export const WeightTracker: React.FC<WeightTrackerProps> = ({
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     backgroundColor: theme.colors.background,
     borderRadius: theme.borderRadius.md,

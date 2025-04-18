@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { Picker } from '@react-native-picker/picker';
-import { User } from '../../types/database';
+import { ActivityLevel, DietaryPreference, FitnessGoal, Gender, UserData } from '@/types/database';
 import { FontAwesome } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
+import React, { useState } from 'react';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type AnthropometryFormProps = {
-  user: User;
-  onSave: (updatedUser: User) => void;
+  user: UserData;
+  onSave: (updatedUser: Partial<UserData>) => void;
   onCancel: () => void;
 };
 
@@ -20,31 +20,35 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
   onCancel
 }) => {
   const { theme } = useUnistyles();
-  const styles = useStyles();
   
   const [name, setName] = useState(user.name || '');
-  const [age, setAge] = useState(user.age?.toString() || '');
-  const [height, setHeight] = useState(user.height?.toString() || '');
-  const [weight, setWeight] = useState(user.weight?.toString() || '');
-  const [gender, setGender] = useState(user.gender || 'male');
-  const [activityLevel, setActivityLevel] = useState(user.activityLevel || 'moderate');
-  const [goal, setGoal] = useState(user.goal || 'maintain');
-  const [dietPreference, setDietPreference] = useState(user.dietPreference || 'balanced');
+  const [age, setAge] = useState(user.anthropometry.age?.toString() || '');
+  const [height, setHeight] = useState(user.anthropometry.height?.toString() || '');
+  const [weight, setWeight] = useState(user.anthropometry.weight?.toString() || '');
+  const [gender, setGender] = useState<Gender>(user.anthropometry.gender || 'male');
+  const [activityLevel, setActivityLevel] = useState<ActivityLevel>(user.anthropometry.activityLevel || 'moderatelyActive');
+  const [goal, setGoal] = useState<FitnessGoal>(user.preferences.fitnessGoal || 'maintenance');
+  const [dietPreference, setDietPreference] = useState<DietaryPreference>(user.preferences.dietaryPreferences[0] || 'omnivore');
 
   const handleSave = () => {
-    const updatedUser: User = {
-      ...user,
+    const updatedUserData: Partial<UserData> = {
       name,
-      age: parseInt(age) || 0,
-      height: parseFloat(height) || 0,
-      weight: parseFloat(weight) || 0,
-      gender,
-      activityLevel,
-      goal,
-      dietPreference,
+      anthropometry: {
+        ...user.anthropometry,
+        age: parseInt(age) || user.anthropometry.age,
+        height: parseFloat(height) || user.anthropometry.height,
+        weight: parseFloat(weight) || user.anthropometry.weight,
+        gender,
+        activityLevel,
+      },
+      preferences: {
+        ...user.preferences,
+        fitnessGoal: goal,
+        dietaryPreferences: [dietPreference, ...user.preferences.dietaryPreferences.slice(1)],
+      },
     };
     
-    onSave(updatedUser);
+    onSave(updatedUserData);
   };
 
   return (
@@ -58,7 +62,7 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
           value={name}
           onChangeText={setName}
           placeholder="Your name"
-          placeholderTextColor={theme.colors.textTertiary}
+          placeholderTextColor={theme.colors.textSecondary}
         />
       </View>
       
@@ -69,8 +73,8 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
           value={age}
           onChangeText={setAge}
           placeholder="Your age"
-          placeholderTextColor={theme.colors.textTertiary}
-          keyboardType="number-pad"
+          keyboardType="numeric"
+          placeholderTextColor={theme.colors.textSecondary}
         />
       </View>
       
@@ -82,6 +86,7 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
             onValueChange={(itemValue) => setGender(itemValue)}
             style={styles.picker}
             dropdownIconColor={theme.colors.text}
+            itemStyle={styles.pickerItem}
           >
             <Picker.Item label="Male" value="male" />
             <Picker.Item label="Female" value="female" />
@@ -98,8 +103,8 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
             value={height}
             onChangeText={setHeight}
             placeholder="Height"
-            placeholderTextColor={theme.colors.textTertiary}
-            keyboardType="decimal-pad"
+            keyboardType="numeric"
+            placeholderTextColor={theme.colors.textSecondary}
           />
         </View>
         
@@ -110,8 +115,8 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
             value={weight}
             onChangeText={setWeight}
             placeholder="Weight"
-            placeholderTextColor={theme.colors.textTertiary}
-            keyboardType="decimal-pad"
+            keyboardType="numeric"
+            placeholderTextColor={theme.colors.textSecondary}
           />
         </View>
       </View>
@@ -126,12 +131,13 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
             onValueChange={(itemValue) => setActivityLevel(itemValue)}
             style={styles.picker}
             dropdownIconColor={theme.colors.text}
+            itemStyle={styles.pickerItem}
           >
-            <Picker.Item label="Sedentary (little or no exercise)" value="sedentary" />
-            <Picker.Item label="Lightly active (light exercise 1-3 days/week)" value="light" />
-            <Picker.Item label="Moderately active (moderate exercise 3-5 days/week)" value="moderate" />
-            <Picker.Item label="Very active (hard exercise 6-7 days/week)" value="active" />
-            <Picker.Item label="Extra active (very hard exercise & physical job)" value="very_active" />
+            <Picker.Item label="Sedentary" value="sedentary" />
+            <Picker.Item label="Lightly Active" value="lightlyActive" />
+            <Picker.Item label="Moderately Active" value="moderatelyActive" />
+            <Picker.Item label="Very Active" value="veryActive" />
+            <Picker.Item label="Extra Active" value="extraActive" />
           </Picker>
         </View>
       </View>
@@ -144,10 +150,11 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
             onValueChange={(itemValue) => setGoal(itemValue)}
             style={styles.picker}
             dropdownIconColor={theme.colors.text}
+            itemStyle={styles.pickerItem}
           >
-            <Picker.Item label="Lose weight" value="lose" />
-            <Picker.Item label="Maintain weight" value="maintain" />
-            <Picker.Item label="Gain muscle" value="gain" />
+            <Picker.Item label="Weight Loss" value="weightLoss" />
+            <Picker.Item label="Maintenance" value="maintenance" />
+            <Picker.Item label="Muscle Gain" value="muscleGain" />
           </Picker>
         </View>
       </View>
@@ -160,8 +167,9 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
             onValueChange={(itemValue) => setDietPreference(itemValue)}
             style={styles.picker}
             dropdownIconColor={theme.colors.text}
+            itemStyle={styles.pickerItem}
           >
-            <Picker.Item label="Balanced" value="balanced" />
+            <Picker.Item label="Omnivore" value="omnivore" />
             <Picker.Item label="Vegetarian" value="vegetarian" />
             <Picker.Item label="Vegan" value="vegan" />
             <Picker.Item label="Keto" value="keto" />
@@ -192,7 +200,7 @@ export const AnthropometryForm: React.FC<AnthropometryFormProps> = ({
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -216,14 +224,14 @@ const useStyles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.xs,
   },
   input: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.surfaceSecondary,
+    borderRadius: theme.borderRadius.sm,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     fontSize: theme.typography.body.fontSize,
     color: theme.colors.text,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    flex: 1,
+    minHeight: 44,
   },
   pickerContainer: {
     backgroundColor: theme.colors.surface,
@@ -233,8 +241,14 @@ const useStyles = StyleSheet.create((theme) => ({
     overflow: 'hidden',
   },
   picker: {
+    backgroundColor: theme.colors.surfaceSecondary,
     color: theme.colors.text,
-    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.sm,
+    minHeight: 44,
+  },
+  pickerItem: {
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surfaceSecondary,
   },
   row: {
     flexDirection: 'row',

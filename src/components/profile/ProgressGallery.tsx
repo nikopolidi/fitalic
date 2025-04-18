@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, Modal, Dimensions } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { FontAwesome } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Dimensions, FlatList, Image, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { ProgressPhoto } from '../../types/database';
 
 type ProgressGalleryProps = {
@@ -19,7 +19,7 @@ export const ProgressGallery: React.FC<ProgressGalleryProps> = ({
   onDeletePhoto
 }) => {
   const { theme } = useUnistyles();
-  const styles = useStyles();
+  
   const [selectedPhoto, setSelectedPhoto] = useState<ProgressPhoto | null>(null);
   
   const screenWidth = Dimensions.get('window').width;
@@ -31,12 +31,12 @@ export const ProgressGallery: React.FC<ProgressGalleryProps> = ({
       onPress={() => setSelectedPhoto(item)}
     >
       <Image 
-        source={{ uri: item.uri }} 
+        source={{ uri: item.imageUri }} 
         style={styles.photo} 
         resizeMode="cover"
       />
       <Text style={styles.photoDate}>
-        {new Date(item.timestamp).toLocaleDateString()}
+        {new Date(item.date).toLocaleDateString()}
       </Text>
     </TouchableOpacity>
   );
@@ -85,16 +85,16 @@ export const ProgressGallery: React.FC<ProgressGalleryProps> = ({
                 {selectedPhoto && (
                   <>
                     <Image 
-                      source={{ uri: selectedPhoto.uri }} 
+                      source={{ uri: selectedPhoto?.imageUri }} 
                       style={styles.fullSizePhoto} 
                       resizeMode="contain"
                     />
                     <View style={styles.photoInfo}>
                       <Text style={styles.photoInfoText}>
-                        {new Date(selectedPhoto.timestamp).toLocaleDateString()}
+                        {new Date(selectedPhoto.date).toLocaleDateString()}
                       </Text>
-                      {selectedPhoto.note && (
-                        <Text style={styles.photoNote}>{selectedPhoto.note}</Text>
+                      {selectedPhoto.notes && (
+                        <Text style={styles.photoNote}>{selectedPhoto.notes}</Text>
                       )}
                     </View>
                     <View style={styles.modalButtons}>
@@ -130,7 +130,7 @@ export const ProgressGallery: React.FC<ProgressGalleryProps> = ({
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     backgroundColor: theme.colors.background,
     borderRadius: theme.borderRadius.md,

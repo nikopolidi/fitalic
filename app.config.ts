@@ -11,6 +11,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version: config.version || '1.0.0',
     scheme: config.scheme || 'fitalic',
     newArchEnabled: true,
+    extra: {
+      "eas": {
+        "projectId": "25fa6105-a4a4-4c73-8cc9-eb90c6c24e1f"
+      }
+    },
     orientation: config.orientation || 'portrait',
     icon: config.icon || './assets/images/app_icons/ios/icon-1024.png',
     userInterfaceStyle: config.userInterfaceStyle || 'light',
@@ -26,30 +31,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       bundleIdentifier: config.ios?.bundleIdentifier || 'com.fitalic.app',
       appleTeamId: config.ios?.appleTeamId || '28UPFCTKBR',
       icon: './assets/images/app_icons/ios/icon-1024.png',
-      // icons: {
-      //   iphone: {
-      //     '2x': './assets/images/app_icons/ios/icon-60@2x.png',
-      //     '3x': './assets/images/app_icons/ios/icon-60@3x.png'
-      //   },
-      //   ipad: {
-      //     '2x': './assets/images/app_icons/ios/icon-76@2x.png'
-      //   },
-      //   ipadPro: {
-      //     '2x': './assets/images/app_icons/ios/icon-83.5@2x.png'
-      //   },
-      //   notification: {
-      //     '2x': './assets/images/app_icons/ios/icon-40@2x.png',
-      //     '3x': './assets/images/app_icons/ios/icon-60@3x.png'
-      //   },
-      //   settings: {
-      //     '2x': './assets/images/app_icons/ios/icon-29@2x.png',
-      //     '3x': './assets/images/app_icons/ios/icon-29@3x.png'
-      //   },
-      //   spotlight: {
-      //     '2x': './assets/images/app_icons/ios/icon-40@2x.png',
-      //     '3x': './assets/images/app_icons/ios/icon-40@3x.png'
-      //   }
-      // }
+      infoPlist: {
+        NSCameraUsageDescription: "Fitalic needs access to your camera to take progress photos",
+        NSMicrophoneUsageDescription: "Fitalic needs access to your microphone to record voice notes",
+        NSPhotoLibraryUsageDescription: "Fitalic needs access to your photo library to save and upload progress photos",
+        NSPhotoLibraryAddUsageDescription: "Fitalic needs permission to save photos to your photo library"
+      },
     },
     android: {
       ...config.android,
@@ -59,13 +46,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       icon: './assets/images/app_icons/ios/icon-1024.png',
       package: config.android?.package || 'com.fitalic.app',
-      // icons: {
-      //   mdpi: './assets/images/app_icons/android/mipmap-mdpi/ic_launcher.png',
-      //   hdpi: './assets/images/app_icons/android/mipmap-hdpi/ic_launcher.png',
-      //   xhdpi: './assets/images/app_icons/android/mipmap-xhdpi/ic_launcher.png',
-      //   xxhdpi: './assets/images/app_icons/android/mipmap-xxhdpi/ic_launcher.png',
-      //   xxxhdpi: './assets/images/app_icons/android/mipmap-xxxhdpi/ic_launcher.png'
-      // }
+      permissions: [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO"
+      ],
     },
     plugins: [
       'expo-router',

@@ -1,31 +1,36 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { useProgressStore } from '@/services/storage/progressStore';
+import { useUserStore } from '@/services/storage/userStore';
+import type { ProgressPhoto, UserData, WeightEntry } from '@/types/database';
 import { FontAwesome } from '@expo/vector-icons';
-import ProfileHeader from './ProfileHeader';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
+import { Alert, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import AnthropometryForm from './AnthropometryForm';
+import ProfileHeader from './ProfileHeader';
 import ProgressGallery from './ProgressGallery';
 import WeightTracker from './WeightTracker';
-import { useUserStore } from '../../services/storage/userStore';
-import { useProgressStore } from '../../services/storage/progressStore';
 
 /**
  * Main profile screen component
  */
 export const ProfileScreen: React.FC = () => {
   const { theme } = useUnistyles();
-  const styles = useStyles();
   const { user, updateUser } = useUserStore();
-  const { progressPhotos, weightEntries, addProgressPhoto, deleteProgressPhoto, addWeightEntry, deleteWeightEntry } = useProgressStore();
+  const { progressData, addPhoto, deletePhoto, addWeightEntry, deleteWeightEntry } = useProgressStore();
   
   const [showEditForm, setShowEditForm] = useState(false);
   
+  if (!user) {
+    return null;
+  }
+
   const handleEditPress = () => {
     setShowEditForm(true);
   };
   
-  const handleSaveProfile = (updatedUser: typeof user) => {
-    updateUser(updatedUser);
+  const handleSaveProfile = (updatedProfile: Partial<UserData>) => {
+    updateUser(updatedProfile);
     setShowEditForm(false);
   };
   
@@ -35,6 +40,87 @@ export const ProfileScreen: React.FC = () => {
   
   const handleAvatarPress = () => {
     // Implement avatar selection logic
+  };
+
+  const handleAddWeightEntry = (weight: number, note: string) => {
+    const newEntry: Omit<WeightEntry, 'id'> = { 
+      date: new Date().getTime(), 
+      weight, 
+      notes: note
+    };
+    addWeightEntry(newEntry);
+  };
+
+  // Handler to trigger photo adding process using expo-image-picker
+  const handleAddPhoto = async () => {
+    // Request media library permissions
+    const mediaLibraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (mediaLibraryPermission.status !== 'granted') {
+      Alert.alert('Permission required', 'Please grant media library permissions to select a photo.');
+      return;
+    }
+
+    // Optionally, request camera permissions if you want to allow taking photos
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    // You might want to handle camera permission denial similarly
+
+    // Show options to choose from library or take a photo
+    Alert.alert(
+      'Add Photo',
+      'Choose an option',
+      [
+        {
+          text: 'Choose from Library',
+          onPress: async () => {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: 'images',
+              allowsEditing: true,
+              aspect: [4, 4],
+              quality: 0.8,
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+              const selectedImage = result.assets[0];
+              const photoData: Omit<ProgressPhoto, 'id'> = {
+                imageUri: selectedImage.uri,
+                date: Date.now(),
+                // Add other fields like notes if needed
+              };
+              addPhoto(photoData);
+            }
+          },
+        },
+        {
+          text: 'Take Photo',
+          onPress: async () => {
+            if (cameraPermission.status !== 'granted') {
+              Alert.alert('Permission required', 'Please grant camera permissions to take a photo.');
+              return;
+            }
+            const result = await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              aspect: [4, 4],
+              quality: 0.8,
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+              const takenImage = result.assets[0];
+              const photoData: Omit<ProgressPhoto, 'id'> = {
+                imageUri: takenImage.uri,
+                date: Date.now(),
+                // Add other fields like notes if needed
+              };
+              addPhoto(photoData);
+            }
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -47,17 +133,17 @@ export const ProfileScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Progress Photos</Text>
         <ProgressGallery 
-          photos={progressPhotos}
-          onAddPhoto={addProgressPhoto}
-          onDeletePhoto={deleteProgressPhoto}
+          photos={progressData.photos}
+          onAddPhoto={handleAddPhoto}
+          onDeletePhoto={deletePhoto}
         />
       </View>
       
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Weight Tracker</Text>
         <WeightTracker 
-          entries={weightEntries}
-          onAddEntry={addWeightEntry}
+          entries={progressData.weightEntries}
+          onAddEntry={handleAddWeightEntry}
           onDeleteEntry={deleteWeightEntry}
         />
       </View>
@@ -105,7 +191,7 @@ export const ProfileScreen: React.FC = () => {
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

@@ -1,11 +1,10 @@
 /**
  * AI service for fitness trainer and dietitian functionality
  */
-import OpenAIService from './openai';
-import { useChatStore } from '../storage';
-import { useUserStore } from '../storage';
-import { ChatMessage, AIResponse } from '../../types/database';
+import { AIResponse } from '../../types/database';
+import { useChatStore, useUserStore } from '../storage';
 import { DEFAULT_TEXT_RECOGNITION_MODEL } from './config';
+import OpenAIService from './openai';
 
 /**
  * AI Fitness Trainer service

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { ChatMessage } from '../../types/database';
 

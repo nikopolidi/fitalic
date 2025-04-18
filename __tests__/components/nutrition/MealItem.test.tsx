@@ -1,7 +1,6 @@
+import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
 import { MealItem } from '../../../src/components/nutrition/MealItem';
-import { createStyleSheet } from 'react-native-unistyles';
 
 // Mock the unistyles hook
 jest.mock('react-native-unistyles', () => ({
@@ -61,7 +60,7 @@ describe('MealItem', () => {
     protein: 30,
     carbs: 50,
     fat: 15,
-    date: new Date().toISOString(),
+    date: new Date().getTime(),
     imageUri: null,
     notes: 'Test notes',
   };

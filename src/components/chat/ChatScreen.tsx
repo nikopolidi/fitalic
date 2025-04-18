@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, FlatList, ActivityIndicator, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { ChatMessage } from '../../types/database';
-import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
+import MessageBubble from './MessageBubble';
 
 type ChatScreenProps = {
   messages: ChatMessage[];

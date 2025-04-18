@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native-unistyles';
-import { darkTheme } from './theme';
+import { AppTheme, darkTheme } from './theme';
 
 // Определяем брейкпоинты
 const breakpoints = {
@@ -24,12 +24,12 @@ const settings = {
 };
 
 // Типы для TypeScript
-type AppThemes = typeof themes;
 type AppBreakpoints = typeof breakpoints;
 
-// Расширяем типы Unistyles
 declare module 'react-native-unistyles' {
-  export interface UnistylesThemes extends AppThemes {}
+  export interface UnistylesThemes {
+    dark: AppTheme;
+  }
   export interface UnistylesBreakpoints extends AppBreakpoints {}
 }
 

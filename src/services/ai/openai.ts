@@ -1,16 +1,16 @@
 /**
  * OpenAI API client for AI fitness trainer functionality
  */
-import { 
-  DEFAULT_MODEL, 
-  DEFAULT_TRANSCRIPTION_MODEL,
+import { AIResponse, ChatMessage } from '../../types/database';
+import {
+  API_ENDPOINTS,
+  DEFAULT_MODEL,
+  DEFAULT_PARAMS,
   DEFAULT_TEXT_RECOGNITION_MODEL,
-  getApiKey, 
-  API_ENDPOINTS, 
-  SYSTEM_PROMPTS, 
-  DEFAULT_PARAMS 
+  DEFAULT_TRANSCRIPTION_MODEL,
+  getApiKey,
+  SYSTEM_PROMPTS
 } from './config';
-import { ChatMessage, AIResponse } from '../../types/database';
 
 // Types for OpenAI API requests and responses
 type ChatCompletionMessage = {

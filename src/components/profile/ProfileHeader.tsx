@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { FontAwesome } from '@expo/vector-icons';
+import React, { useMemo } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useUserStore } from '../../services/storage/userStore';
 
 type ProfileHeaderProps = {
@@ -17,13 +17,19 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onAvatarPress
 }) => {
   const { theme } = useUnistyles();
-  const styles = useStyles();
+  
   const { user } = useUserStore();
   
   // Calculate BMI
-  const bmi = user.height > 0 
-    ? (user.weight / ((user.height / 100) * (user.height / 100))).toFixed(1) 
+  const bmi = useMemo(()=>{
+    if(!user) return '0';
+    // Access height and weight via user.anthropometry
+    const height = user.anthropometry.height || 0;
+    const weight = user.anthropometry.weight || 0;
+    return height > 0
+    ? (weight / ((height / 100) * (height / 100))).toFixed(1)
     : '0';
+  }, [user]) // Add user as dependency
   
   // Determine BMI category
   const getBmiCategory = (bmi: number) => {
@@ -34,7 +40,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
   
   const bmiCategory = getBmiCategory(parseFloat(bmi));
-
+  if(!user) return null;
   return (
     <View style={styles.container}>
       <TouchableOpacity 
@@ -61,14 +67,14 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{user.height || 0}</Text>
+            <Text style={styles.statValue}>{user.anthropometry.height || 0}</Text>
             <Text style={styles.statLabel}>cm</Text>
           </View>
           
           <View style={styles.divider} />
           
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{user.weight || 0}</Text>
+            <Text style={styles.statValue}>{user.anthropometry.weight || 0}</Text>
             <Text style={styles.statLabel}>kg</Text>
           </View>
           
@@ -95,7 +101,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.md,

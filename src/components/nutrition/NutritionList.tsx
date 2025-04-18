@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, FlatList, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Meal } from '../../types/database';
 import MealItem from './MealItem';
-import { FontAwesome } from '@expo/vector-icons';
 
 type NutritionListProps = {
   meals: Meal[];

@@ -1,6 +1,6 @@
-import { renderHook, act } from '@testing-library/react-hooks';
-import { useNutritionStore } from '../../../src/services/storage/nutritionStore';
+import { act, renderHook } from '@testing-library/react-hooks';
 import { MMKV } from 'react-native-mmkv';
+import { useNutritionStore } from '../../../src/services/storage/nutritionStore';
 
 // Mock MMKV
 jest.mock('react-native-mmkv', () => {
@@ -39,7 +39,7 @@ describe('NutritionStore', () => {
       protein: 30,
       carbs: 50,
       fat: 15,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       imageUri: null,
       notes: 'Test notes',
     };
@@ -63,7 +63,7 @@ describe('NutritionStore', () => {
       protein: 30,
       carbs: 50,
       fat: 15,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       imageUri: null,
       notes: 'Test notes',
     };
@@ -99,7 +99,7 @@ describe('NutritionStore', () => {
       protein: 30,
       carbs: 50,
       fat: 15,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       imageUri: null,
       notes: 'Test notes',
     };
@@ -216,7 +216,7 @@ describe('NutritionStore', () => {
       protein: 30,
       carbs: 50,
       fat: 15,
-      date: new Date().toISOString(),
+      date: new Date().getTime(),
       imageUri: null,
       notes: 'Test notes',
     };
