@@ -1,418 +1,214 @@
-/**
- * OpenAI API client for AI fitness trainer functionality
- */
-import { AIResponse, ChatMessage } from '../../types/database';
+// src/services/OpenAIService.ts
+import { OpenAI } from 'openai'
+import { Platform } from 'react-native'
+import { AIResponse, ChatMessage } from '../../types/database'
 import {
-  API_ENDPOINTS,
   DEFAULT_MODEL,
   DEFAULT_PARAMS,
   DEFAULT_TEXT_RECOGNITION_MODEL,
   DEFAULT_TRANSCRIPTION_MODEL,
   getApiKey,
   SYSTEM_PROMPTS
-} from './config';
+} from './config'
 
-// Types for OpenAI API requests and responses
-type ChatCompletionMessage = {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-};
+// 1) initialize OpenAI client
+const client = new OpenAI({
+  apiKey: getApiKey(),
+  // baseURL defaults to "https://api.openai.com/v1"
+})
 
-type ChatCompletionRequest = {
-  model: string;
-  messages: ChatCompletionMessage[];
-  temperature?: number;
-  max_tokens?: number;
-  top_p?: number;
-  frequency_penalty?: number;
-  presence_penalty?: number;
-  response_format?: { type: string };
-};
-
-type ChatCompletionResponse = {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  choices: {
-    index: number;
-    message: {
-      role: string;
-      content: string;
-    };
-    finish_reason: string;
-  }[];
-  usage: {
-    prompt_tokens: number;
-    completion_tokens: number;
-    total_tokens: number;
-  };
-};
-
-type TranscriptionRequest = {
-  file: Blob;
-  model: string;
-  language?: string;
-  prompt?: string;
-  response_format?: string;
-  temperature?: number;
-};
-
-type TranscriptionResponse = {
-  text: string;
-};
-
-/**
- * Make a request to the OpenAI API
- * @param endpoint API endpoint
- * @param method HTTP method
- * @param body Request body
- * @param headers Additional headers
- * @returns Response data
- */
-const makeRequest = async <T>(
-  endpoint: string,
-  method: 'GET' | 'POST',
-  body?: any,
-  headers?: Record<string, string>,
-  isFormData = false
-): Promise<T> => {
-  try {
-    const apiKey = getApiKey();
-    
-    if (!apiKey || apiKey === 'YOUR_OPENAI_API_KEY') {
-      throw new Error('OpenAI API key is not configured. Please add it to your .env file.');
-    }
-    
-    const defaultHeaders: Record<string, string> = {
-      'Authorization': `Bearer ${apiKey}`,
-    };
-    
-    if (!isFormData) {
-      defaultHeaders['Content-Type'] = 'application/json';
-    }
-    
-    const response = await fetch(endpoint, {
-      method,
-      headers: {
-        ...defaultHeaders,
-        ...headers,
-      },
-      body: isFormData ? body : (body ? JSON.stringify(body) : undefined),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(`API request failed: ${response.status} ${response.statusText} ${JSON.stringify(errorData)}`);
-    }
-    
-    return await response.json() as T;
-  } catch (error) {
-    console.error('API request error:', error);
-    throw error;
-  }
-};
-
-/**
- * Parse AI response to extract structured data
- * @param text Response text from AI
- * @returns Parsed response with structured data if available
- */
-const parseAIResponse = (text: string): AIResponse => {
-  try {
-    // Check if the response contains a JSON block
-    const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
-    
-    if (jsonMatch && jsonMatch[1]) {
-      try {
-        const jsonData = JSON.parse(jsonMatch[1]);
-        
-        // Extract the text without the JSON block
-        const textWithoutJson = text.replace(/```json\n[\s\S]*?\n```/, '').trim();
-        
-        return {
-          text: textWithoutJson,
-          data: jsonData,
-          type: jsonData.type || 'general',
-          nextSteps: jsonData.nextSteps || [],
-          questions: jsonData.questions || [],
-        };
-      } catch (e) {
-        console.error('Error parsing JSON from AI response:', e);
+/** Internal JSON parser (unchanged) */
+function parseAIResponse(text: string): AIResponse {
+  const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/)
+  if (jsonMatch?.[1]) {
+    try {
+      const data = JSON.parse(jsonMatch[1])
+      const stripped = text.replace(/```json\n[\s\S]*?\n```/, '').trim()
+      return {
+        text: stripped,
+        data,
+        type: data.type ?? 'general',
+        nextSteps: data.nextSteps ?? [],
+        questions: data.questions ?? [],
       }
+    } catch {
+      // fall back
     }
-    
-    // If no JSON block or parsing failed, return just the text
-    return {
-      text,
-    };
-  } catch (error) {
-    console.error('Error parsing AI response:', error);
-    return { text };
   }
-};
+  return { text }
+}
 
-/**
- * OpenAI API service for AI fitness trainer functionality
- */
 export const OpenAIService = {
-  /**
-   * Send a chat completion request to OpenAI
-   * @param messages Chat messages
-   * @param systemPrompt System prompt to use
-   * @param options Additional options
-   * @returns AI response
-   */
-  sendChatRequest: async (
+  /** 2) Chat completions via `openai` */
+  async sendChatRequest(
     messages: ChatMessage[],
     systemPrompt: keyof typeof SYSTEM_PROMPTS = 'fitnessTrainer',
-    options: Partial<ChatCompletionRequest> = {}
-  ): Promise<AIResponse> => {
-    try {
-      // Format messages for OpenAI API
-      const formattedMessages: ChatCompletionMessage[] = [
-        {
-          role: 'system',
-          content: SYSTEM_PROMPTS[systemPrompt],
-        },
-        ...messages.map(msg => ({
-          role: msg.role as 'user' | 'assistant',
-          content: msg.content,
-        })),
-      ];
-      
-      // Prepare request
-      const request: ChatCompletionRequest = {
-        model: options.model || DEFAULT_MODEL,
-        messages: formattedMessages,
-        temperature: options.temperature || DEFAULT_PARAMS.chat.temperature,
-        max_tokens: options.max_tokens || DEFAULT_PARAMS.chat.max_tokens,
-        top_p: options.top_p || DEFAULT_PARAMS.chat.top_p,
-        frequency_penalty: options.frequency_penalty || DEFAULT_PARAMS.chat.frequency_penalty,
-        presence_penalty: options.presence_penalty || DEFAULT_PARAMS.chat.presence_penalty,
-        response_format: { type: 'text' },
-      };
-      
-      // Send request
-      const response = await makeRequest<ChatCompletionResponse>(
-        API_ENDPOINTS.chatCompletions,
-        'POST',
-        request
-      );
-      
-      // Extract and parse response
-      const responseText = response.choices[0]?.message.content || '';
-      return parseAIResponse(responseText);
-    } catch (error) {
-      console.error('Error sending chat request:', error);
-      throw error;
+    options: Partial<{
+      model: string
+      temperature: number
+      max_tokens: number
+      top_p: number
+      frequency_penalty: number
+      presence_penalty: number
+    }> = {}
+  ): Promise<AIResponse> {
+    const models = await client.models.list()
+    console.log(models.data.map(m => m.id))
+
+    const formatted = [
+      { role: 'system' as const, content: SYSTEM_PROMPTS[systemPrompt] },
+      ...messages.map(m => ({ role: m.role as any, content: m.content })),
+    ]
+
+    const params = {
+      model:             options.model            ?? DEFAULT_MODEL,
+      messages:          formatted,
+      temperature:       options.temperature      ?? DEFAULT_PARAMS.chat.temperature,
+      max_tokens:        options.max_tokens       ?? DEFAULT_PARAMS.chat.max_tokens,
+      top_p:             options.top_p            ?? DEFAULT_PARAMS.chat.top_p,
+      frequency_penalty: options.frequency_penalty ?? DEFAULT_PARAMS.chat.frequency_penalty,
+      presence_penalty:  options.presence_penalty  ?? DEFAULT_PARAMS.chat.presence_penalty,
+      // streaming: false, // enable if you ever want to stream
     }
+
+    const res = await client.chat.completions.create(params)
+    const content = res.choices?.[0]?.message?.content ?? ''
+    return parseAIResponse(content)
   },
-  
-  /**
-   * Transcribe audio to text using gpt-4o-mini-transcribe model
-   * @param audioFile Audio file blob
-   * @param options Additional options
-   * @returns Transcribed text
-   */
-  transcribeAudio: async (
-    audioFile: Blob,
-    options: Partial<TranscriptionRequest> = {}
-  ): Promise<string> => {
-    try {
-      // Prepare form data
-      const formData = new FormData();
-      formData.append('file', audioFile);
-      formData.append('model', options.model || DEFAULT_TRANSCRIPTION_MODEL);
-      
-      if (options.language) {
-        formData.append('language', options.language);
-      } else {
-        formData.append('language', DEFAULT_PARAMS.transcription.language);
-      }
-      
-      if (options.prompt) {
-        formData.append('prompt', options.prompt);
-      }
-      
-      formData.append('response_format', 
-        options.response_format || DEFAULT_PARAMS.transcription.response_format
-      );
-      
-      formData.append('temperature', 
-        String(options.temperature || DEFAULT_PARAMS.transcription.temperature)
-      );
-      
-      // Send request
-      const response = await makeRequest<TranscriptionResponse>(
-        API_ENDPOINTS.audioTranscriptions,
-        'POST',
-        formData,
-        {},
-        true // isFormData
-      );
-      
-      return response.text;
-    } catch (error) {
-      console.error('Error transcribing audio:', error);
-      throw error;
+
+  /** 3) Audio transcription in Expo via `fetch(uri).blob()` */
+  async transcribeAudio(
+    fileUri: string,  // local URI from Expo ImagePicker or FileSystem
+    options: Partial<{
+      prompt?: string
+      language?: string
+      response_format?: string
+      temperature?: number
+    }> = {}
+  ): Promise<string> {
+    // fetch the file from the device (works in Expo)
+    const uri = Platform.select({ ios: fileUri, android: fileUri, web: fileUri })
+    if (!uri) throw new Error('Invalid file URI')
+
+    const resp = await fetch(uri)
+    const blob = await resp.blob()
+
+    const params: any = {
+      file:            blob,
+      model:           DEFAULT_TRANSCRIPTION_MODEL,
+      language:        options.language         ?? DEFAULT_PARAMS.transcription.language,
+      response_format: options.response_format  ?? DEFAULT_PARAMS.transcription.response_format,
+      temperature:     options.temperature      ?? DEFAULT_PARAMS.transcription.temperature,
     }
+    if (options.prompt) params.prompt = options.prompt
+
+    const result = await client.audio.transcriptions.create(params)
+    return result.text
   },
-  
-  /**
-   * Analyze food from text description using o4-mini model
-   * @param description Food description
-   * @param userContext User context for personalization
-   * @returns Analysis of the food
-   */
-  analyzeFoodFromText: async (
+
+  /** Analyze food from text */
+  async analyzeFoodFromText(
     description: string,
     userContext: any = {}
-  ): Promise<AIResponse> => {
-    try {
-      // Create a prompt that includes the food description and user context
-      const userMessage: ChatMessage = {
-        id: `food_analysis_${Date.now()}`,
-        role: 'user',
-        content: `Please analyze this food: ${description}. Provide nutritional information and how it fits my goals.`,
-        timestamp: Date.now(),
-      };
-      
-      // Add context about the user's goals and preferences
-      const contextMessage: ChatMessage = {
-        id: `context_${Date.now()}`,
-        role: 'system',
-        content: `User context: ${JSON.stringify(userContext)}`,
-        timestamp: Date.now(),
-      };
-      
-      // Send request with food analysis system prompt and o4-mini model
-      return await OpenAIService.sendChatRequest(
-        [contextMessage, userMessage],
-        'foodAnalysis',
-        { model: DEFAULT_TEXT_RECOGNITION_MODEL }
-      );
-    } catch (error) {
-      console.error('Error analyzing food from text:', error);
-      throw error;
-    }
+  ): Promise<AIResponse> {
+    const userMessage: ChatMessage = {
+      id: `food_analysis_${Date.now()}`,
+      role: 'user',
+      content: `Please analyze this food: ${description}. Provide nutritional information and how it fits my goals.`,
+      timestamp: Date.now(),
+    };
+    const contextMessage: ChatMessage = {
+      id: `context_${Date.now()}`,
+      role: 'system',
+      content: `User context: ${JSON.stringify(userContext)}`,
+      timestamp: Date.now(),
+    };
+    // Assuming sendChatRequest is defined within the same object or accessible scope
+    return this.sendChatRequest(
+      [contextMessage, userMessage],
+      'foodAnalysis',
+      { model: DEFAULT_TEXT_RECOGNITION_MODEL }
+    );
   },
-  
-  /**
-   * Analyze food from image using o4-mini model
-   * @param imageBase64 Base64 encoded image
-   * @param additionalText Additional text description
-   * @param userContext User context for personalization
-   * @returns Analysis of the food
-   */
-  analyzeFoodFromImage: async (
+
+  /** Analyze food from image (requires vision model) */
+  async analyzeFoodFromImage(
     imageBase64: string,
     additionalText: string = '',
     userContext: any = {}
-  ): Promise<AIResponse> => {
-    try {
-      // For GPT-4 Vision, we need to use a different approach
-      // This is a simplified implementation that would need to be updated
-      // when the actual API integration is done
-      
-      // Create messages with image content
-      const messages: ChatCompletionMessage[] = [
-        {
-          role: 'system',
-          content: SYSTEM_PROMPTS.foodAnalysis + 
-            `\nAdditional context: ${JSON.stringify(userContext)}`,
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `Analyze this food image${additionalText ? ': ' + additionalText : ''}. Provide nutritional information and how it fits my goals.`,
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:image/jpeg;base64,${imageBase64}`,
-              },
-            },
-          ],
-        },
-      ];
-      
-      // This is a placeholder for the actual implementation
-      // In a real implementation, we would use the OpenAI API for vision with o4-mini model
-      
-      // Mock response for now
-      return {
-        text: "I'll need to implement the actual image analysis with OpenAI's vision capabilities using o4-mini model.",
-        type: 'nutrition',
-      };
-    } catch (error) {
-      console.error('Error analyzing food from image:', error);
-      throw error;
-    }
-  },
-  
-  /**
-   * Get initial assessment questions using o4-mini model
-   * @param language User's preferred language
-   * @returns Initial assessment questions
-   */
-  getInitialAssessment: async (language: string = 'en'): Promise<AIResponse> => {
-    try {
-      const userMessage: ChatMessage = {
-        id: `initial_assessment_${Date.now()}`,
-        role: 'user',
-        content: `I'm new to fitness and nutrition. Can you help me get started? (Language: ${language})`,
-        timestamp: Date.now(),
-      };
-      
-      return await OpenAIService.sendChatRequest(
-        [userMessage],
-        'initialAssessment',
-        { model: DEFAULT_TEXT_RECOGNITION_MODEL }
-      );
-    } catch (error) {
-      console.error('Error getting initial assessment:', error);
-      throw error;
-    }
-  },
-  
-  /**
-   * Get workout recommendations using o4-mini model
-   * @param userGoals User's fitness goals
-   * @param userContext User context for personalization
-   * @returns Workout recommendations
-   */
-  getWorkoutRecommendations: async (
-    userGoals: string,
-    userContext: any = {}
-  ): Promise<AIResponse> => {
-    try {
-      const userMessage: ChatMessage = {
-        id: `workout_${Date.now()}`,
-        role: 'user',
-        content: `I need workout recommendations for my goal: ${userGoals}`,
-        timestamp: Date.now(),
-      };
-      
-      const contextMessage: ChatMessage = {
-        id: `context_${Date.now()}`,
+  ): Promise<AIResponse> {
+    const messages: any[] = [
+      {
         role: 'system',
-        content: `User context: ${JSON.stringify(userContext)}`,
-        timestamp: Date.now(),
-      };
-      
-      return await OpenAIService.sendChatRequest(
-        [contextMessage, userMessage],
-        'workoutAdvice',
-        { model: DEFAULT_TEXT_RECOGNITION_MODEL }
-      );
-    } catch (error) {
-      console.error('Error getting workout recommendations:', error);
-      throw error;
-    }
-  },
-};
+        content: SYSTEM_PROMPTS.foodAnalysis + 
+          `\nAdditional context: ${JSON.stringify(userContext)}`,
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: `Analyze this food image${additionalText ? ': ' + additionalText : ''}. Provide nutritional info & fit with goals.`,
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/jpeg;base64,${imageBase64}`,
+            },
+          },
+        ],
+      },
+    ];
 
-export default OpenAIService;
+    // Use sendChatRequest which handles the API call
+    // Note: Ensure the DEFAULT_MODEL or passed model supports vision (e.g., gpt-4o, gpt-4-turbo)
+    return this.sendChatRequest(
+      messages, // Pass the specially formatted messages array
+      'foodAnalysis', // Keep the system prompt context
+      { model: DEFAULT_MODEL } // Ensure a vision-capable model is used
+    );
+  },
+
+  /** Get initial assessment questions */
+  async getInitialAssessment(language: string = 'en'): Promise<AIResponse> {
+    const userMessage: ChatMessage = {
+      id: `initial_assessment_${Date.now()}`,
+      role: 'user',
+      content: `I'm new to fitness and nutrition. Can you help me get started? (Language: ${language})`,
+      timestamp: Date.now(),
+    };
+    return this.sendChatRequest(
+      [userMessage],
+      'initialAssessment',
+      { model: DEFAULT_TEXT_RECOGNITION_MODEL }
+    );
+  },
+
+  /** Get workout recommendations */
+  async getWorkoutRecommendations(
+    goalDescription: string,
+    userContext: any = {}
+  ): Promise<AIResponse> {
+    const userMessage: ChatMessage = {
+      id: `workout_${Date.now()}`,
+      role: 'user',
+      content: `I need workout recommendations for my goal: ${goalDescription}`,
+      timestamp: Date.now(),
+    };
+    const contextMessage: ChatMessage = {
+      id: `context_${Date.now()}`,
+      role: 'system',
+      content: `User context: ${JSON.stringify(userContext)}`,
+      timestamp: Date.now(),
+    };
+    return this.sendChatRequest(
+      [contextMessage, userMessage],
+      'workoutAdvice',
+      { model: DEFAULT_TEXT_RECOGNITION_MODEL }
+    );
+  },
+
+  // …you can refactor other endpoints (images, embeddings, etc.) in the same way.
+}
+
+export default OpenAIService

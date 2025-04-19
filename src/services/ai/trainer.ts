@@ -21,6 +21,7 @@ export const AITrainerService = {
     message: string,
     attachments?: { type: 'image' | 'audio'; uri: string }[]
   ): Promise<AIResponse> => {
+    let newMessageId: string | null = null; // Declare outside try block
     try {
       // Get user context for personalization
       const userStore = useUserStore.getState();
@@ -37,8 +38,8 @@ export const AITrainerService = {
       const chatStore = useChatStore.getState();
       const chatContext = chatStore.getContextForAI();
       
-      // Create a new message
-      const newMessageId = chatStore.addMessage({
+      // Assign inside try block
+      newMessageId = chatStore.addMessage({
         role: 'user',
         content: message,
         timestamp: Date.now(),
@@ -97,15 +98,13 @@ export const AITrainerService = {
     } catch (error) {
       console.error('Error sending message to AI trainer:', error);
       
-      // Add error message to chat
-      const chatStore = useChatStore.getState();
-      chatStore.addMessage({
-        role: 'assistant',
-        content: 'Sorry, I encountered an error processing your request. Please try again later.',
-        timestamp: Date.now(),
-      });
+      // Mark the user message as failed
+      if (newMessageId) { // Now newMessageId is accessible here
+        const chatStore = useChatStore.getState();
+        chatStore.updateMessage(newMessageId, { error: true });
+      }
       
-      throw error;
+      throw error; // Rethrow the error
     }
   },
   
@@ -114,9 +113,9 @@ export const AITrainerService = {
    * @param audioBlob Audio file blob
    * @returns Transcribed text
    */
-  transcribeAudio: async (audioBlob: Blob): Promise<string> => {
+  transcribeAudio: async (fileUri: string): Promise<string> => {
     try {
-      return await OpenAIService.transcribeAudio(audioBlob);
+      return await OpenAIService.transcribeAudio(fileUri);
     } catch (error) {
       console.error('Error transcribing audio:', error);
       throw error;

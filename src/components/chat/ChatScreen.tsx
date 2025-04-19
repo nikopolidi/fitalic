@@ -19,7 +19,7 @@ type ChatScreenProps = {
  * Main chat screen component that displays messages and input
  */
 export const ChatScreen: React.FC<ChatScreenProps> = ({
-  messages,
+  messages = [],
   isLoading,
   onSendMessage,
   onStartRecording,
@@ -27,7 +27,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
   onAttachmentPress,
   isRecording
 }) => {
-  const styles = useStyles();
+  
   const { theme } = useUnistyles();
   
   const renderMessage = ({ item, index }: { item: ChatMessage; index: number }) => (
@@ -76,7 +76,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

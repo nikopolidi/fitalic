@@ -3,7 +3,7 @@ import { useUserStore } from '@/services/storage/userStore';
 import type { ProgressPhoto, UserData, WeightEntry } from '@/types/database';
 import { FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import AnthropometryForm from './AnthropometryForm';
@@ -21,9 +21,11 @@ export const ProfileScreen: React.FC = () => {
   
   const [showEditForm, setShowEditForm] = useState(false);
   
-  if (!user) {
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      updateUser({});
+    }
+  }, [user]);
 
   const handleEditPress = () => {
     setShowEditForm(true);
@@ -182,7 +184,7 @@ export const ProfileScreen: React.FC = () => {
         onRequestClose={() => setShowEditForm(false)}
       >
         <AnthropometryForm 
-          user={user}
+          user={user as UserData}
           onSave={handleSaveProfile}
           onCancel={handleCancelEdit}
         />

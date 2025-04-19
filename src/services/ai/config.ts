@@ -1,26 +1,28 @@
+import Constants from 'expo-constants';
+
 /**
  * OpenAI API configuration
  */
 
 // Default models to use for different purposes
-export const DEFAULT_MODEL = 'gpt-4o';
+export const DEFAULT_MODEL = 'gpt-4o-mini';
 export const DEFAULT_TRANSCRIPTION_MODEL = 'gpt-4o-mini-transcribe';
-export const DEFAULT_TEXT_RECOGNITION_MODEL = 'o4-mini';
-
+export const DEFAULT_TEXT_RECOGNITION_MODEL = 'gpt-4o-mini';
 // Environment variables for API keys
 // These will be loaded from .env file in production
 export const getApiKey = (): string => {
   // In a real app, this would use process.env or expo-constants
   // For development, we'll use a placeholder that will be replaced
-  return process.env.OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY';
+  return Constants.expoConfig?.extra?.openaiApiKey;
 };
 
 // API endpoints
+export const API_BASE_URL = 'https://api.openai.com/v1';
 export const API_ENDPOINTS = {
-  chatCompletions: 'https://api.openai.com/v1/chat/completions',
-  audioTranscriptions: 'https://api.openai.com/v1/audio/transcriptions',
-  audioTranslations: 'https://api.openai.com/v1/audio/translations',
-  imageGenerations: 'https://api.openai.com/v1/images/generations',
+  chatCompletions: '/chat/completions',
+  audioTranscriptions: '/audio/transcriptions',
+  audioTranslations: '/audio/translations',
+  imageGenerations: '/images/generations',
 };
 
 // System prompts for different contexts

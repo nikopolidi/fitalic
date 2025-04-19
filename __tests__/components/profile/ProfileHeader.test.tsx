@@ -1,7 +1,6 @@
+import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
 import { ProfileHeader } from '../../../src/components/profile/ProfileHeader';
-import { createStyleSheet } from 'react-native-unistyles';
 
 // Mock the unistyles hook
 jest.mock('react-native-unistyles', () => ({
@@ -70,7 +69,7 @@ describe('ProfileHeader', () => {
     goal: 'maintain',
     dietPreference: 'balanced',
     avatarUri: null,
-    caloriesGoal: 2000,
+    nutritionGoals: 2000,
     proteinGoal: 150,
     carbsGoal: 200,
     fatGoal: 65,

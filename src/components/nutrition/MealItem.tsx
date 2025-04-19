@@ -14,7 +14,7 @@ type MealItemProps = {
  * Component for displaying a single meal item with nutrition information
  */
 export const MealItem: React.FC<MealItemProps> = ({ meal, onPress, onDelete }) => {
-  const styles = useStyles();
+  
   
   return (
     <TouchableOpacity 
@@ -25,7 +25,7 @@ export const MealItem: React.FC<MealItemProps> = ({ meal, onPress, onDelete }) =
       <View style={styles.header}>
         <Text style={styles.title}>{meal.name}</Text>
         <Text style={styles.time}>
-          {new Date(meal.timestamp).toLocaleTimeString([], { 
+          {new Date(meal.date).toLocaleTimeString([], { 
             hour: '2-digit', 
             minute: '2-digit' 
           })}
@@ -34,28 +34,28 @@ export const MealItem: React.FC<MealItemProps> = ({ meal, onPress, onDelete }) =
       
       <View style={styles.nutritionContainer}>
         <View style={styles.nutritionItem}>
-          <Text style={styles.nutritionValue}>{meal.calories}</Text>
+          <Text style={styles.nutritionValue}>{meal.totalCalories}</Text>
           <Text style={styles.nutritionLabel}>kcal</Text>
         </View>
         
         <View style={styles.divider} />
         
         <View style={styles.nutritionItem}>
-          <Text style={styles.nutritionValue}>{meal.protein}g</Text>
+          <Text style={styles.nutritionValue}>{meal.totalMacros.protein}g</Text>
           <Text style={styles.nutritionLabel}>Protein</Text>
         </View>
         
         <View style={styles.divider} />
         
         <View style={styles.nutritionItem}>
-          <Text style={styles.nutritionValue}>{meal.carbs}g</Text>
+          <Text style={styles.nutritionValue}>{meal.totalMacros.carbs}g</Text>
           <Text style={styles.nutritionLabel}>Carbs</Text>
         </View>
         
         <View style={styles.divider} />
         
         <View style={styles.nutritionItem}>
-          <Text style={styles.nutritionValue}>{meal.fat}g</Text>
+          <Text style={styles.nutritionValue}>{meal.totalMacros.fat}g</Text>
           <Text style={styles.nutritionLabel}>Fat</Text>
         </View>
       </View>
@@ -71,7 +71,7 @@ export const MealItem: React.FC<MealItemProps> = ({ meal, onPress, onDelete }) =
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.md,

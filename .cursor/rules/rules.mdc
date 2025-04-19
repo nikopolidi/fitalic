@@ -14,3 +14,10 @@ alwaysApply: true
 - typescript types prefered over interfaces
 - for any text added to the code always use english, even for comments
 - всегда используй в коде английский язык и в коде и вкомментариях
+- always styles created with import { StyleSheet } from 'react-native-unistyles'
+like: 
+```typescript
+const styles = StyleSheet.create(theme => ({
+  // ...
+}))
+```

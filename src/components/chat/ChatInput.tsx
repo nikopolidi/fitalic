@@ -24,7 +24,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [message, setMessage] = useState('');
   const inputRef = useRef<TextInput>(null);
   const { theme } = useUnistyles();
-  const styles = useStyles();
+  
 
   const handleSend = () => {
     if (message.trim()) {
@@ -83,7 +83,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,7 +1,7 @@
-import { ChatScreen } from '@/components/chat';
+import { ChatContainer } from '@/components/chat';
 
 export default function HomeScreen() {
   return (
-    <ChatScreen />
+    <ChatContainer />
   );
 }

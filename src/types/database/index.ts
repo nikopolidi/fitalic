@@ -2,9 +2,9 @@
  * Index file for database types
  */
 
-export * from './user';
 export * from './nutrition';
 export * from './progress';
+export * from './user';
 
 // AI Chat types
 export type ChatMessage = {
@@ -16,6 +16,7 @@ export type ChatMessage = {
     type: 'image' | 'audio';
     uri: string;
   }[];
+  error?: boolean;
 };
 
 export type ChatSession = {

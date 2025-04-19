@@ -1,6 +1,6 @@
-import { renderHook, act } from '@testing-library/react-hooks';
-import { useUserStore } from '../../../src/services/storage/userStore';
+import { act, renderHook } from '@testing-library/react-hooks';
 import { MMKV } from 'react-native-mmkv';
+import { useUserStore } from '../../../src/services/storage/userStore';
 
 // Mock MMKV
 jest.mock('react-native-mmkv', () => {
@@ -37,7 +37,7 @@ describe('UserStore', () => {
       goal: 'maintain',
       dietPreference: 'balanced',
       avatarUri: null,
-      caloriesGoal: 2000,
+      nutritionGoals: 2000,
       proteinGoal: 150,
       carbsGoal: 200,
       fatGoal: 65,
@@ -108,14 +108,14 @@ describe('UserStore', () => {
     
     act(() => {
       result.current.updateNutritionGoals({
-        caloriesGoal: 2500,
+        nutritionGoals: 2500,
         proteinGoal: 180,
         carbsGoal: 250,
         fatGoal: 70,
       });
     });
     
-    expect(result.current.user.caloriesGoal).toBe(2500);
+    expect(result.current.user.nutritionGoals).toBe(2500);
     expect(result.current.user.proteinGoal).toBe(180);
     expect(result.current.user.carbsGoal).toBe(250);
     expect(result.current.user.fatGoal).toBe(70);

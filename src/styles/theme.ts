@@ -1,4 +1,3 @@
-
 export const darkTheme = {
   colors: {
     // Base colors
@@ -11,7 +10,7 @@ export const darkTheme = {
     text: '#FFFFFF',
     textSecondary: '#A0A0A0',
     textTertiary: '#666666',
-    
+    textContrast: '#000000',
     // Accent colors
     primary: '#FF00FF', // Fuchsia
     primaryLight: '#FF33FF',
@@ -83,6 +82,21 @@ export const darkTheme = {
     h3: {
       fontSize: 20,
       lineHeight: 28,
+      fontWeight: '600',
+    },
+    h4: {
+      fontSize: 18,
+      lineHeight: 26,
+      fontWeight: '600',
+    },
+    h5: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '600',
+    },
+    h6: {
+      fontSize: 14,
+      lineHeight: 20,
       fontWeight: '600',
     },
     code: {

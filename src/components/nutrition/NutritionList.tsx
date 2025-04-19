@@ -12,7 +12,7 @@ type NutritionListProps = {
   onMealPress: (meal: Meal) => void;
   onDeleteMeal: (mealId: string) => void;
   dailyCalories: number;
-  caloriesGoal: number;
+  nutritionGoals: number;
   protein: number;
   carbs: number;
   fat: number;
@@ -30,7 +30,7 @@ export const NutritionList: React.FC<NutritionListProps> = ({
   onMealPress,
   onDeleteMeal,
   dailyCalories,
-  caloriesGoal,
+  nutritionGoals,
   protein,
   carbs,
   fat,
@@ -38,7 +38,7 @@ export const NutritionList: React.FC<NutritionListProps> = ({
   onDateChange
 }) => {
   const { theme } = useUnistyles();
-  const styles = useStyles();
+  
   
   const renderMeal = ({ item }: { item: Meal }) => (
     <MealItem 
@@ -48,21 +48,39 @@ export const NutritionList: React.FC<NutritionListProps> = ({
     />
   );
 
-  const formatDate = (date: Date) => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (date.toDateString() === today.toDateString()) {
-      return 'Today';
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-      return 'Tomorrow';
-    } else {
-      return date.toLocaleDateString();
+  const formatDate = (inputDate: Date): string => {
+    try {
+      if (!(inputDate instanceof Date) || isNaN(inputDate.getTime())) {
+        throw new Error('Invalid date provided to formatDate');
+      }
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize today to the start of the day
+      
+      const normalizedInputDate = new Date(inputDate);
+      normalizedInputDate.setHours(0, 0, 0, 0); // Normalize input date
+
+      const timeDiff = normalizedInputDate.getTime() - today.getTime();
+      const dayDiff = Math.round(timeDiff / (1000 * 60 * 60 * 24));
+
+      switch (dayDiff) {
+        case 0:
+          return 'Today';
+        case -1:
+          return 'Yesterday';
+        case 1:
+          return 'Tomorrow';
+        default:
+          return inputDate.toLocaleDateString(undefined, {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+          });
+      }
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      // Return a default or error string, or rethrow based on requirements
+      return 'Invalid Date'; 
     }
   };
 
@@ -78,8 +96,8 @@ export const NutritionList: React.FC<NutritionListProps> = ({
     onDateChange(newDate);
   };
 
-  const caloriesRemaining = caloriesGoal - dailyCalories;
-  const caloriesProgress = Math.min(dailyCalories / caloriesGoal, 1);
+  const caloriesRemaining = nutritionGoals - dailyCalories;
+  const caloriesProgress = Math.min(dailyCalories / nutritionGoals, 1);
 
   return (
     <View style={styles.container}>
@@ -162,7 +180,7 @@ export const NutritionList: React.FC<NutritionListProps> = ({
           color={theme.colors.primary} 
           style={styles.loader} 
         />
-      ) : meals.length === 0 ? (
+      ) : meals?.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No meals recorded for this day</Text>
           <TouchableOpacity 
@@ -185,7 +203,7 @@ export const NutritionList: React.FC<NutritionListProps> = ({
   );
 };
 
-const useStyles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

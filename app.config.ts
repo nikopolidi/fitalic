@@ -12,9 +12,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     scheme: config.scheme || 'fitalic',
     newArchEnabled: true,
     extra: {
+      openaiApiKey: process.env.OPENAI_API_KEY,
       "eas": {
         "projectId": "25fa6105-a4a4-4c73-8cc9-eb90c6c24e1f"
-      }
+      },
     },
     orientation: config.orientation || 'portrait',
     icon: config.icon || './assets/images/app_icons/ios/icon-1024.png',
