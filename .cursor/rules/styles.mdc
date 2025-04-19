@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Правила стилизации с React Native Unistyles v3
+
+Этот документ описывает предпочтительный паттерн для создания и применения стилей с использованием `react-native-unistyles` v3 в этом проекте.
+
+## Основной паттерн для компонентов со стилями и вариантами
+
+1.  **Определение стилей (`StyleSheet.create`)**:
+    *   Стили для компонента определяются с помощью `StyleSheet.create(theme => ({...}))`.
+    *   Этот вызов может находиться как внутри, так и снаружи функционального компонента, главное, чтобы компонент имел доступ к результирующей переменной `styles`.
+
+2.  **Структура Вариантов (`variants`)**:
+    *   Блок `variants` определяется **внутри** конкретного ключа стиля, к которому он относится (например, `text: { variants: { ... } }`).
+    *   Внутри `variants` создается ключ, соответствующий **имени варианта** (например, `variant`, `size`, `color`).
+    *   Значением этого ключа является объект, где ключи — это **возможные значения варианта** (например, 'h1', 'body', 'sm', 'primary'), а значения — соответствующие им **объекты стилей**. Часто эти стили можно взять напрямую из темы (`theme.typography`, `theme.colors`).
+
+3.  **Применение Вариантов (`styles.useVariants`)**:
+    *   Внутри функционального компонента вызывается метод `styles.useVariants({...})`.
+    *   В аргумент передается объект, где ключи — это **имена вариантов**, а значения — **текущие значения** этих вариантов, полученные из пропсов или состояния компонента.
+
+4.  **Использование стилей в JSX**:
+    *   К элементу применяется базовый стиль, содержащий варианты (например, `styles.text`). Предполагается, что вызов `styles.useVariants` неявно модифицирует этот объект стилей.
+    *   Пользовательские стили, переданные через проп `style`, объединяются с базовым стилем с помощью массива: `style={[styles.text, userStyle]}`.
+
+## Пример: Компонент Typography
+
+```typescript
+import React from 'react';
+import { StyleProp, Text, TextProps as RNTextProps, TextStyle } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
+import { AppTheme } from '../styles/theme'; // Adjust path if needed
+
+export type TypographyVariant = keyof AppTheme['typography'];
+
+export type TypographyProps = Omit<RNTextProps, 'style'> & {
+  variant?: TypographyVariant;
+  style?: StyleProp<TextStyle>;
+};
+
+const DEFAULT_VARIANT: TypographyVariant = 'body';
+
+// 1. Стили определены (могут быть и внутри компонента)
+const styles = StyleSheet.create(theme => ({
+  text: {
+    // 2. Варианты определены ВНУТРИ стиля 'text'
+    variants: {
+      // Имя варианта: 'variant'
+      variant: theme.typography // Значения вариантов берутся из темы
+    }
+  }
+}));
+
+export const Typography: React.FC<TypographyProps> = ({
+  variant = DEFAULT_VARIANT,
+  style,
+  children,
+  ...rest
+}) => {
+  // 3. Применение варианта внутри компонента
+  styles.useVariants({ variant });
+
+  return (
+    // 4. Использование базового стиля + пользовательских стилей
+    <Text style={[styles.text, style]} {...rest}>
+      {children}
+    </Text>
+  );
+};
+
+export default Typography;
+```
+
+---
+
+Следуй этому паттерну при создании новых компонентов или рефакторинге существующих.

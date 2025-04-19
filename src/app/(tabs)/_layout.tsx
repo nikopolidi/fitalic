@@ -1,12 +1,20 @@
-import { TabBarIcon } from '@/components/TabBarIcon';
+import { Icon } from '@/components/Icon';
+import { TabBarIcon } from '@/components/TabBar/TabBarIcon';
 import { useChatStore } from '@/services/storage';
-import { FontAwesome } from '@expo/vector-icons';
+// import { BottomTabBarProps } from '@react-navigation/bottom-tabs'; // Removed
+import TabBar from '@/components/TabBar/TabBar'; // Import the new TabBar
+import { AppTheme } from '@/styles/theme';
 import { Tabs } from 'expo-router';
-import { Alert, TouchableOpacity } from 'react-native';
-import { useUnistyles } from 'react-native-unistyles';
+import { Alert, TouchableOpacity } from 'react-native'; // Removed Text, View
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+
+// Custom TabBar Component - Removed from here
+// function MyTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+//   ...
+// }
 
 export default function TabLayout() {
-  const { theme } = useUnistyles();
+  const { theme } = useUnistyles(); // Keep for theme access
   
   // Select state reactively
   const currentSessionId = useChatStore(state => state.currentSessionId);
@@ -39,22 +47,14 @@ export default function TabLayout() {
       ]
     );
   };
-
+  
   return (
     <Tabs
+      // Use the imported TabBar component
+      tabBar={(props)=> <TabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.text,
-        tabBarInactiveTintColor: theme.colors.textTertiary,
-        tabBarStyle: { 
-          backgroundColor: theme.colors.background,
-          borderTopColor: theme.colors.border 
-        },
-        headerStyle: { 
-          backgroundColor: theme.colors.background 
-        },
-        headerTitleStyle: {
-          color: theme.colors.text
-        },
+        headerStyle: {backgroundColor: styles.header.backgroundColor}, 
+        headerTitleStyle: styles.headerTitle,
         headerTintColor: theme.colors.text,
       }}
     >
@@ -62,21 +62,23 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Chat',
-          tabBarIcon: ({ focused, color }) => 
+          tabBarIcon: ({ focused, color, size }) => 
             <TabBarIcon 
-              name={"comment"}
-              color={focused ? 'primary': 'textSecondary'}
+              family={"ionicons"}
+              name={focused ? "chatbubbles" : "chatbubbles-outline"}
+              color={color as keyof AppTheme['colors']}
+              size={String(size) as keyof AppTheme['icon']['size']}
             />,
-          headerRight: () => (
+          headerRight: (props) => (
             <TouchableOpacity 
               onPress={handleClearChat} 
               disabled={isChatEmpty}
-              style={{ marginRight: theme.spacing.md }}
+              style={styles.headerRightButton}
             >
-              <FontAwesome 
+              <Icon 
                 name="trash-o"
-                size={22} 
-                color={isChatEmpty ? theme.colors.textTertiary : theme.colors.error} 
+                size={'md'} 
+                color={'primary'} 
               />
             </TouchableOpacity>
           ),
@@ -86,10 +88,13 @@ export default function TabLayout() {
         name="nutrition"
         options={{
           title: 'Nutrition',
-          tabBarIcon: ({ focused, color }) => 
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => 
             <TabBarIcon 
-              name="cutlery"
-              color={focused ? 'primary': 'textSecondary'}
+              family="ionicons"
+              name={focused ? "nutrition" : "nutrition-outline"}
+              color={color as keyof AppTheme['colors']}
+              size={String(size) as keyof AppTheme['icon']['size']}
             />,
         }}
       />
@@ -97,13 +102,33 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ focused, color }) => 
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused, color, size }) => 
             <TabBarIcon 
-              name={"user"}
-              color={focused ? 'primary': 'textSecondary'}
+              name={focused ? "user" : "user-o"}
+              color={color as keyof AppTheme['colors']}
+              size={String(size) as keyof AppTheme['icon']['size']}
             />,
         }}
       />
     </Tabs>
   );
-} 
+}
+
+// Define styles outside the component
+// Keep only styles used outside the TabBar component
+const styles = StyleSheet.create(theme => ({
+  // Removed tabBarContainer and tabBarButton
+  header: {
+    backgroundColor: theme.colors.background, 
+  },
+  headerTitle: {
+    color: theme.colors.text,
+  },
+  headerRightButton: {
+    marginRight: theme.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+  },
+})); 

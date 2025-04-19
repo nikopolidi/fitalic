@@ -48,6 +48,7 @@ function RootNavigator() {
   
   return (
     <Stack
+      initialRouteName='(tabs)'
       screenOptions={{
         headerStyle: { 
           backgroundColor: theme.colors.background 

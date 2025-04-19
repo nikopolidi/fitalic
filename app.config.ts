@@ -7,7 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const baseConfig: ExpoConfig = {
     ...config,
     name: config.name || 'Fitalic',
-    slug: config.slug || 'fitalic',
+    slug: config.slug || 'Fitalic',
     version: config.version || '1.0.0',
     scheme: config.scheme || 'fitalic',
     newArchEnabled: true,
@@ -82,40 +82,40 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       './plugins/withIosDeploymentTarget',
       '@bacons/apple-targets',
-      [
-        './plugins/withAndroidWidget',
-        {
-          widgetName: 'Fitalic Widget',
-          widgetDescription: 'Track your calories and protein goals',
-          widgetResizeMode: 'none',
-          widgetMinWidth: 200,
-          widgetMinHeight: 100,
-          widgetUpdatePeriodMillis: 1800000, // 30 minutes
-          widgetLayout: {
-            type: 'LinearLayout',
-            children: [
-              {
-                type: 'TextView',
-                id: 'target_calories',
-                text: '0 cal',
-                style: {
-                  textSize: '16sp',
-                  textColor: '#000000'
-                }
-              },
-              {
-                type: 'TextView',
-                id: 'target_protein',
-                text: '0g',
-                style: {
-                  textSize: '16sp',
-                  textColor: '#000000'
-                }
-              }
-            ]
-          }
-        }
-      ]
+      // [
+      //   './plugins/withAndroidWidget',
+      //   {
+      //     widgetName: 'Fitalic Widget',
+      //     widgetDescription: 'Track your calories and protein goals',
+      //     widgetResizeMode: 'none',
+      //     widgetMinWidth: 200,
+      //     widgetMinHeight: 100,
+      //     widgetUpdatePeriodMillis: 1800000, // 30 minutes
+      //     widgetLayout: {
+      //       type: 'LinearLayout',
+      //       children: [
+      //         {
+      //           type: 'TextView',
+      //           id: 'target_calories',
+      //           text: '0 cal',
+      //           style: {
+      //             textSize: '16sp',
+      //             textColor: '#000000'
+      //           }
+      //         },
+      //         {
+      //           type: 'TextView',
+      //           id: 'target_protein',
+      //           text: '0g',
+      //           style: {
+      //             textSize: '16sp',
+      //             textColor: '#000000'
+      //           }
+      //         }
+      //       ]
+      //     }
+      //   }
+      // ]
     ],
   };
 

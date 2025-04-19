@@ -1,3 +1,4 @@
+import { dummyAction } from '@/utils/dummy';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
@@ -42,17 +43,16 @@ export const NutritionContainer: React.FC = () => {
   
   // Function to handle the initiation of adding a meal
   const handleAddMealPress = () => {
+    console.log('handleAddMealPress triggered');
+    dummyAction()
     // TODO: Implement navigation or modal logic to add a new meal
-    console.log('Add meal button pressed - initiate meal creation flow');
-    // Example: navigation.navigate('AddMealScreen', { date: selectedDate });
-    // On save from that screen, you would call `addMealAction` with the Meal data.
   };
 
   // Function to handle pressing a meal item (e.g., view details)
   const handleMealPress = (meal: Meal) => {
+    console.log('handleMealPress triggered for meal:', meal.id);
+    dummyAction()
     // TODO: Implement navigation or logic to view meal details
-    console.log('View meal details for:', meal.id);
-    // Example: navigation.navigate('MealDetailScreen', { mealId: meal.id });
   };
 
   // Function to handle deleting a meal

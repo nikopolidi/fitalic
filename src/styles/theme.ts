@@ -12,13 +12,13 @@ export const darkTheme = {
     textTertiary: '#666666',
     textContrast: '#000000',
     // Accent colors
-    primary: '#FF00FF', // Fuchsia
-    primaryLight: '#FF33FF',
-    primaryDark: '#CC00CC',
+    primary: '#E6418F', // Updated Primary
+    primaryLight: '#F377AE', // Lighter variant
+    primaryDark: '#B82E72', // Darker variant
     
-    secondary: '#00FFFF', // Cyan as contrast
-    secondaryLight: '#33FFFF',
-    secondaryDark: '#00CCCC',
+    secondary: '#0ABAB5', // Tiffany Blue
+    secondaryLight: '#1DDDDD', // Lighter variant
+    secondaryDark: '#088F94', // Darker variant
     
     // System colors
     success: '#34C759',

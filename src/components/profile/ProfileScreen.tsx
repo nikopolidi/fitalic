@@ -1,6 +1,7 @@
 import { useProgressStore } from '@/services/storage/progressStore';
 import { useUserStore } from '@/services/storage/userStore';
 import type { ProgressPhoto, UserData, WeightEntry } from '@/types/database';
+import { dummyAction } from '@/utils/dummy';
 import { FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
@@ -152,25 +153,25 @@ export const ProfileScreen: React.FC = () => {
       
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Settings</Text>
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={styles.settingItem} onPress={dummyAction}>
           <FontAwesome name="bell" size={20} color={theme.colors.primary} style={styles.settingIcon} />
           <Text style={styles.settingText}>Notifications</Text>
           <FontAwesome name="chevron-right" size={16} color={theme.colors.textSecondary} />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={styles.settingItem} onPress={dummyAction}>
           <FontAwesome name="lock" size={20} color={theme.colors.primary} style={styles.settingIcon} />
           <Text style={styles.settingText}>Privacy</Text>
           <FontAwesome name="chevron-right" size={16} color={theme.colors.textSecondary} />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={styles.settingItem} onPress={dummyAction}>
           <FontAwesome name="question-circle" size={20} color={theme.colors.primary} style={styles.settingIcon} />
           <Text style={styles.settingText}>Help & Support</Text>
           <FontAwesome name="chevron-right" size={16} color={theme.colors.textSecondary} />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={styles.settingItem} onPress={dummyAction}>
           <FontAwesome name="info-circle" size={20} color={theme.colors.primary} style={styles.settingIcon} />
           <Text style={styles.settingText}>About</Text>
           <FontAwesome name="chevron-right" size={16} color={theme.colors.textSecondary} />
