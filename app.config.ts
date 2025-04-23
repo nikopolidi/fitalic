@@ -1,16 +1,15 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
-// import { Platform } from 'react-native';
-// import { Platform } from 'expo-modules-core';
 
 export default ({ config }: ConfigContext): ExpoConfig => {
  
   const baseConfig: ExpoConfig = {
     ...config,
-    name: config.name || 'Fitalic',
+    name: 'Fitalic',
     slug: config.slug || 'Fitalic',
     version: config.version || '1.0.0',
     scheme: config.scheme || 'fitalic',
     newArchEnabled: true,
+    backgroundColor: '#000000',
     extra: {
       openaiApiKey: process.env.OPENAI_API_KEY,
       "eas": {
@@ -42,10 +41,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       ...config.android,
       adaptiveIcon: {
-        foregroundImage: './assets/images/app_icons/ios/icon-1024.png',
+        foregroundImage: './assets/images/app_icons/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png',
         backgroundColor: '#000000'
       },
-      icon: './assets/images/app_icons/ios/icon-1024.png',
+      icon: './assets/images/app_icons/android/res/mipmap-xxxhdpi/ic_launcher.png',
       package: config.android?.package || 'com.fitalic.app',
       permissions: [
         "CAMERA",
@@ -82,40 +81,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       './plugins/withIosDeploymentTarget',
       '@bacons/apple-targets',
-      // [
-      //   './plugins/withAndroidWidget',
-      //   {
-      //     widgetName: 'Fitalic Widget',
-      //     widgetDescription: 'Track your calories and protein goals',
-      //     widgetResizeMode: 'none',
-      //     widgetMinWidth: 200,
-      //     widgetMinHeight: 100,
-      //     widgetUpdatePeriodMillis: 1800000, // 30 minutes
-      //     widgetLayout: {
-      //       type: 'LinearLayout',
-      //       children: [
-      //         {
-      //           type: 'TextView',
-      //           id: 'target_calories',
-      //           text: '0 cal',
-      //           style: {
-      //             textSize: '16sp',
-      //             textColor: '#000000'
-      //           }
-      //         },
-      //         {
-      //           type: 'TextView',
-      //           id: 'target_protein',
-      //           text: '0g',
-      //           style: {
-      //             textSize: '16sp',
-      //             textColor: '#000000'
-      //           }
-      //         }
-      //       ]
-      //     }
-      //   }
-      // ]
     ],
   };
 

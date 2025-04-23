@@ -269,7 +269,7 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: 'center',
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
     width: '48%',
   },
   cancelButton: {

@@ -1,12 +1,11 @@
 /**
- * Index file for AI services
+ * Entry point for AI services
  */
-import OpenAIService from './openai';
-import AITrainerService from './trainer';
-import { SYSTEM_PROMPTS } from './config';
 
-export {
-  OpenAIService,
-  AITrainerService,
-  SYSTEM_PROMPTS
-};
+// Re-export configurations
+export * from './openaiConfig';
+
+// Re-export main services
+export { default as OpenAIService } from './openai';
+export { default as AITrainerService } from './trainer';
+

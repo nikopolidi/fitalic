@@ -1,11 +1,12 @@
-import { Icon } from '@/components/Icon';
 import { TabBarIcon } from '@/components/TabBar/TabBarIcon';
 import { useChatStore } from '@/services/storage';
 // import { BottomTabBarProps } from '@react-navigation/bottom-tabs'; // Removed
+import IconButton from '@/components/IconButton';
 import TabBar from '@/components/TabBar/TabBar'; // Import the new TabBar
 import { AppTheme } from '@/styles/theme';
 import { Tabs } from 'expo-router';
-import { Alert, TouchableOpacity } from 'react-native'; // Removed Text, View
+import { useCallback } from 'react';
+import { Alert } from 'react-native'; // Removed Text, View
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 // Custom TabBar Component - Removed from here
@@ -47,7 +48,18 @@ export default function TabLayout() {
       ]
     );
   };
-  
+
+  const chatHeaderRight = useCallback(()=>{
+    return (
+      <IconButton 
+        onPress={handleClearChat} 
+        disabled={isChatEmpty}
+        name="trash-o"
+        size={'md'}
+      />
+    )
+  }, [isChatEmpty])
+
   return (
     <Tabs
       // Use the imported TabBar component
@@ -56,6 +68,7 @@ export default function TabLayout() {
         headerStyle: {backgroundColor: styles.header.backgroundColor}, 
         headerTitleStyle: styles.headerTitle,
         headerTintColor: theme.colors.text,
+        tabBarShowLabel: false
       }}
     >
       <Tabs.Screen
@@ -69,19 +82,7 @@ export default function TabLayout() {
               color={color as keyof AppTheme['colors']}
               size={String(size) as keyof AppTheme['icon']['size']}
             />,
-          headerRight: (props) => (
-            <TouchableOpacity 
-              onPress={handleClearChat} 
-              disabled={isChatEmpty}
-              style={styles.headerRightButton}
-            >
-              <Icon 
-                name="trash-o"
-                size={'md'} 
-                color={'primary'} 
-              />
-            </TouchableOpacity>
-          ),
+          headerRight: chatHeaderRight,
         }}
       />
       <Tabs.Screen

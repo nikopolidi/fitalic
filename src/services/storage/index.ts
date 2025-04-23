@@ -1,24 +1,19 @@
 /**
  * Index file for storage services
  */
-import { storage, getItem, setItem, removeItem, clearAll, getAllKeys } from './mmkv';
-import { useUserStore } from './userStore';
+import { clearAll, getAllKeys, getItem, removeItem, setItem, storage } from '../../storage/mmkv';
+import { useChatStore } from './chatStore';
 import { useNutritionStore } from './nutritionStore';
 import { useProgressStore } from './progressStore';
-import { useChatStore } from './chatStore';
+import { useUserStore } from './userStore';
 
 export {
-  // MMKV storage
-  storage,
-  getItem,
-  setItem,
-  removeItem,
   clearAll,
-  getAllKeys,
-  
-  // Zustand stores
-  useUserStore,
-  useNutritionStore,
+  getAllKeys, getItem, removeItem, setItem,
+  // MMKV storage
+  storage, useChatStore, useNutritionStore,
   useProgressStore,
-  useChatStore
+  // Zustand stores
+  useUserStore
 };
+

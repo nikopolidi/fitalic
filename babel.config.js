@@ -5,7 +5,9 @@ module.exports = function (api) {
     presets: ['babel-preset-expo'],
     plugins: [
       'react-native-reanimated/plugin',
-      ['react-native-unistyles/plugin']
+      ['react-native-unistyles/plugin', {
+        autoProcessPaths: ['@bambooapp/bamboo-molecules']
+      }]
     ]
   };
 }; 

@@ -2,6 +2,9 @@
  * Index file for database types
  */
 
+import { ToolCall } from '@/services/ai/openai';
+
+
 export * from './nutrition';
 export * from './progress';
 export * from './user';
@@ -32,4 +35,5 @@ export type AIResponse = {
   type?: 'nutrition' | 'workout' | 'general' | 'anthropometry';
   nextSteps?: string[];
   questions?: string[];
+  toolCalls?: ToolCall[]
 };

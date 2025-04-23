@@ -74,6 +74,61 @@ export const Typography: React.FC<TypographyProps> = ({
 export default Typography;
 ```
 
+## Пример использования compoundVariants
+
+```typescript
+const styles = StyleSheet.create(theme => ({
+    baseText: {
+        fontFamily: theme.fonts.base,
+        fontWeight: 'normal'
+    },
+    themedText: {
+        variants: {
+            size: {
+                small: {
+                    fontSize: 12
+                },
+                medium: {
+                    fontSize: 16
+                },
+                large: {
+                    fontSize: 20
+                }
+            },
+            isBold: {
+                true: {
+                    fontWeight: 'bold'
+                }
+            },
+            color: {
+                primary: {
+                    color: theme.colors.primary
+                },
+                secondary: {
+                    color: theme.colors.secondary
+                },
+                link: {
+                    color: theme.colors.link
+                }
+            }
+        },
+        compoundVariants: [
+            {
+                isBold: true, // when variants.isBold is true
+                color: 'link', // and variants.color is link
+                // apply following styles
+                styles: {
+                    textDecorationLine: 'underline'
+                    // and more styles
+                }
+            }
+        ]
+    }
+}
+```
+
 ---
 
+
 Следуй этому паттерну при создании новых компонентов или рефакторинге существующих.
+

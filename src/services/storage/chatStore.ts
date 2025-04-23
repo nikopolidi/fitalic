@@ -1,15 +1,15 @@
 /**
  * Zustand store for chat functionality with MMKV persistence
  */
+import { storage } from '@/storage';
+import * as Crypto from 'expo-crypto';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { storage } from './mmkv';
-import { 
-  ChatMessage, 
-  ChatSession,
-  AIResponse
+import {
+  ChatMessage,
+  ChatSession
 } from '../../types/database';
-
+const uuid = Crypto.randomUUID;
 // Interface for the chat store
 interface ChatStore {
   sessions: ChatSession[];
@@ -45,7 +45,7 @@ export const useChatStore = create<ChatStore>()(
       currentSessionId: null,
       
       createSession: () => {
-        const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        const sessionId = uuid();
         const timestamp = Date.now();
         
         const newSession: ChatSession = {
@@ -98,7 +98,7 @@ export const useChatStore = create<ChatStore>()(
           return get().addMessage(messageData); // Recursive call with new session
         }
         
-        const messageId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        const messageId = uuid();
         const newMessage: ChatMessage = {
           ...messageData,
           id: messageId

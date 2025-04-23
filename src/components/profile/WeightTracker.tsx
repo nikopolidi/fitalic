@@ -228,7 +228,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
     paddingVertical: theme.spacing.xs,
     paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   addButtonText: {
     color: theme.colors.text,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   emptyAddButtonText: {
     color: theme.colors.text,
@@ -332,7 +332,7 @@ const styles = StyleSheet.create((theme) => ({
   modalButton: {
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
     width: '48%',
     alignItems: 'center',
   },

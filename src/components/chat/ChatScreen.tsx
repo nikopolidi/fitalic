@@ -1,5 +1,5 @@
-import React from 'react';
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { FlatList, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { ChatMessage } from '../../types/database';
 import ChatInput from './ChatInput';
@@ -29,19 +29,23 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
 }) => {
   
   const { theme } = useUnistyles();
+
+  const lastMessageIndex = useMemo(()=>{
+    return messages.length - 1
+  }, [messages?.length])
   
-  const renderMessage = ({ item, index }: { item: ChatMessage; index: number }) => (
+  const renderMessage = useCallback(({ item, index }: { item: ChatMessage; index: number }) => (
     <MessageBubble 
       message={item} 
-      isLastMessage={index === messages.length - 1} 
+      isLastMessage={index === lastMessageIndex} 
     />
-  );
+  ), [lastMessageIndex]);
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 100}
     >
       {messages.length === 0 && !isLoading ? (
         <View style={styles.emptyContainer}>
@@ -57,12 +61,6 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
           contentContainerStyle={styles.messageList}
           inverted
         />
-      )}
-      
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
       )}
       
       <ChatInput

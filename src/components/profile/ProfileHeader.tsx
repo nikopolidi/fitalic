@@ -193,7 +193,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
     alignSelf: 'center',
   },
   editButtonText: {

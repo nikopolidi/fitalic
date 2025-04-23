@@ -1125,7 +1125,7 @@ Adaptive themes allow Unistyles to automatically manage the selection of your th
 StyleSheet.configure({
     themes: {
         light: lightTheme,
-        dark: darkTheme,
+        dark: defaultTheme,
         // you may have more themes
     }
 })
@@ -1137,7 +1137,7 @@ StyleSheet.configure({
 StyleSheet.configure({
     themes: {
         light: lightTheme,
-        dark: darkTheme
+        dark: defaultTheme
     },
     settings: {
         adaptiveThemes: true
@@ -3298,7 +3298,7 @@ Unistyles 3.0 converts all your themes to CSS variables by default, eliminating 
 In more detail, it converts all **strings** into CSS variables. For example, if we have the following theme:
 
 ```ts
-const darkTheme = {
+const defaultTheme = {
     colors: {
         primary: '#4b7594'
     },
@@ -3364,7 +3364,7 @@ const lightTheme = {
 }
 
 
-const darkTheme = {
+const defaultTheme = {
     colors: {
         ...sharedColors,
         background: '#000',

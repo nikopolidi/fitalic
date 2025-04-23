@@ -3,8 +3,8 @@
  */
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { storage } from '../../storage/mmkv';
 import { Anthropometry, FitnessGoal, NutritionGoals, UserData, UserPreferences } from '../../types/database';
-import { storage } from './mmkv';
 
 // Default values for a new user
 const DEFAULT_ANTHROPOMETRY: Anthropometry = {

@@ -273,13 +273,13 @@ const styles = StyleSheet.create((theme) => ({
   progressBackground: {
     height: 8,
     backgroundColor: theme.colors.borderLight,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: theme.colors.success,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   progressExceeded: {
     backgroundColor: theme.colors.error,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
     paddingVertical: theme.spacing.xs,
     paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   addButtonText: {
     color: theme.colors.text,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   emptyAddButtonText: {
     color: theme.colors.text,

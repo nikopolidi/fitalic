@@ -1,17 +1,16 @@
 /**
  * Zustand store for nutrition tracking with MMKV persistence
  */
+import { storage } from '@/storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { storage } from './mmkv';
-import { 
-  DailyNutrition, 
-  Meal, 
-  ConsumedFood, 
-  FoodItem, 
-  MealType, 
+import {
+  ConsumedFood,
+  DailyNutrition,
+  FoodItem,
   MacroNutrients,
-  NutritionResponse
+  Meal,
+  MealType
 } from '../../types/database';
 
 // Interface for the nutrition store

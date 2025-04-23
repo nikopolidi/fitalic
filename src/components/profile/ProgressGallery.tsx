@@ -190,7 +190,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   addButtonText: {
     color: theme.colors.text,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.opacity(theme.colors.error, 0.1),
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   deleteButtonText: {
     color: theme.colors.error,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surfaceSecondary,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
   },
   closeButtonText: {
     color: theme.colors.text,

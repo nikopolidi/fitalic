@@ -1,10 +1,11 @@
 /**
  * AI service for fitness trainer and dietitian functionality
  */
+import { UserContext } from '@/types';
 import { AIResponse } from '../../types/database';
-import { useChatStore, useUserStore } from '../storage';
-import { DEFAULT_TEXT_RECOGNITION_MODEL } from './config';
+import { useChatStore, useNutritionStore, useUserStore } from '../storage';
 import OpenAIService from './openai';
+import { SystemPrompt } from './openaiConfig';
 
 /**
  * AI Fitness Trainer service
@@ -25,13 +26,15 @@ export const AITrainerService = {
     try {
       // Get user context for personalization
       const userStore = useUserStore.getState();
+      const nutritionStore = useNutritionStore.getState();
       const user = userStore.user;
       
       // Create user context object for the AI
-      const userContext = user ? {
+      const userContext: UserContext = user ? {
         anthropometry: user.anthropometry,
         nutritionGoals: user.nutritionGoals,
         preferences: user.preferences,
+        foodIntakes: nutritionStore.getDailyNutrition(new Date().getTime())
       } : undefined;
       
       // Get chat context (recent messages)
@@ -67,23 +70,23 @@ export const AITrainerService = {
           // For now, we'll use the message directly
           response = await OpenAIService.sendChatRequest(
             [...chatContext, { id: newMessageId, role: 'user', content: message, timestamp: Date.now() }],
-            'fitnessTrainer',
-            { model: DEFAULT_TEXT_RECOGNITION_MODEL }
+            SystemPrompt.FITNESS_TRAINER,
+            userContext,
           );
         } else {
           // Fallback to regular chat
           response = await OpenAIService.sendChatRequest(
             [...chatContext, { id: newMessageId, role: 'user', content: message, timestamp: Date.now() }],
-            'fitnessTrainer',
-            { model: DEFAULT_TEXT_RECOGNITION_MODEL }
+            SystemPrompt.FITNESS_TRAINER,
+            userContext
           );
         }
       } else {
         // Regular text message
         response = await OpenAIService.sendChatRequest(
           [...chatContext, { id: newMessageId, role: 'user', content: message, timestamp: Date.now() }],
-          'fitnessTrainer',
-          { model: DEFAULT_TEXT_RECOGNITION_MODEL }
+          SystemPrompt.FITNESS_TRAINER,
+          userContext
         );
       }
       
